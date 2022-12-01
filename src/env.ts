@@ -9,13 +9,13 @@ config({
 
 const getProdEnv = () => {
   return {
-    networkAddress: env.get('COMMON.NETWORK_ADDRESS').required().asString(),
+    networkAddress: env.get('NETWORK_ADDRESS').required().asString(),
 
     discord: {
-      token: env.get('COMMON.DISCORD.TOKEN').required().asString(),
-      clientId: env.get('COMMON.DISCORD.CLIENT_ID').required().asString(),
-      channelId: env.get('COMMON.DISCORD.CHANNEL_ID').required().asString(),
-      authorizedUserId: env.get('COMMON.DISCORD.AUTHORIZED_USER_ID').required().asString(),
+      token: env.get('DISCORD.TOKEN').required().asString(),
+      clientId: env.get('DISCORD.CLIENT_ID').required().asString(),
+      channelId: env.get('DISCORD.CHANNEL_ID').required().asString(),
+      authorizedUserId: env.get('DISCORD.AUTHORIZED_USER_ID').required().asString(),
     },
 
     notion: {
