@@ -4,10 +4,10 @@ import fs from 'fs-extra';
 
 import { PlaylistRepo, Playlist, Music } from '@zougui/common.music-repo';
 
-import { music } from '../../../env';
+import env from '../../../env';
 
 export class MusicNamingService {
-  #repo: PlaylistRepo = new PlaylistRepo(music.dir);
+  readonly #repo: PlaylistRepo = new PlaylistRepo(env.music.dir);
 
   async moveToPlaylist(options: MusicOptions): Promise<void> {
     const filePath = await this.getFilePath(options);
@@ -39,7 +39,7 @@ export class MusicNamingService {
   }
 
   private async getFilePath(options: MusicOptions): Promise<string> {
-    const filePath = path.join(music.tempDir, options.fileName);
+    const filePath = path.join(env.music.tempDir, options.fileName);
     const doesFileExist = await fs.pathExists(filePath);
 
     if (!doesFileExist) {

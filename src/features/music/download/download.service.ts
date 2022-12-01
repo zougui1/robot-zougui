@@ -5,14 +5,14 @@ import { DownloadState } from '@zougui/common.music-repo/lib/youtube/downloader/
 
 import { getProgressMessage, getProgressionFinishedMessage } from './utils';
 import { Exception } from '../../../error';
-import { music } from '../../../env';
+import env from '../../../env';
 
 export class DownloadService {
   static readonly errorCodes = {
     noPlaylist: 'ERR_NO_PLAYLIST',
   } as const;
 
-  #repo: PlaylistRepo = new PlaylistRepo(music.dir);
+  readonly #repo: PlaylistRepo = new PlaylistRepo(env.music.dir);
 
   async getPlaylistNamesSuggestions(options: { search: string }): Promise<string[]> {
     const search = options.search.toLowerCase();
@@ -45,7 +45,7 @@ export class DownloadService {
 
     const downloader = Youtube.downloadAudio(url, {
       trackNumber: Music.stringifyTrackNumber(newTrackNumber),
-      outputDir: music.tempDir,
+      outputDir: env.music.tempDir,
     });
 
     let lastState: DownloadState | undefined;

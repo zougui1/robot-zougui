@@ -2,19 +2,19 @@ import { Client } from '@notionhq/client';
 import createDebug from 'debug';
 
 import { Story } from './story.model';
-import { notion } from '../../env';
+import env from '../../env';
 import { getFullPageList } from '../../notion';
 
-const debug = createDebug('notion-trackers:watch:notion');
+const debug = createDebug('robot-zougui:watch:notion');
 
 export class StoryNotion {
-  #client: Client = new Client({ auth: notion.token });
+  readonly #client: Client = new Client({ auth: env.notion.token });
 
   getStoryList = async ({ name, reading, nameComparison }: GetStoryListOptions): Promise<Story.Instance[]> => {
     debug(`Find the story "${name}" with status reading=${reading}`);
 
     const result = await this.#client.databases.query({
-      database_id: notion.databases.stories.id,
+      database_id: env.notion.databases.stories.id,
       sorts: [
         {
           property: 'Name',

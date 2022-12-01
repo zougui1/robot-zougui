@@ -28,4 +28,10 @@ export class SelectMenuMap {
       }
     } catch {}
   }
+
+  destroy(): void {
+    for (const menu of Object.values(this.menus)) {
+      menu.destroy();
+    }
+  }
 }

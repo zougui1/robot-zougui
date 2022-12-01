@@ -1,4 +1,4 @@
-import { Service } from '../../watch-start.service';
+import { WatchStartService } from '../../watch-start.service';
 import { findUnitsSuggestions } from '../../../../common/utils';
 import { Option } from '../../../../../discord';
 import { parseListableNumber } from '../../../../../utils';
@@ -7,7 +7,7 @@ export const seasonsOption = new Option('[seasons]')
   .description('Choose the seasons you are going to watch')
   .autocomplete(async ({ value, interaction }) => {
     const showName = interaction.options.getString('name', true);
-    const service = new Service();
+    const service = new WatchStartService();
     const seasons = await service.findSeasons({ name: showName });
 
     return findUnitsSuggestions(seasons, {

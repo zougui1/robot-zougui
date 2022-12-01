@@ -4,15 +4,15 @@ import { DateTime } from 'luxon';
 
 import { StoryNotion } from '../story.notion';
 import { Chapter } from '../chapter.model';
-import { notion } from '../../../env';
+import env from '../../../env';
 import { getFullPageList } from '../../../notion';
 
-export class Notion extends StoryNotion {
-  #client: Client = new Client({ auth: notion.token });
+export class ReadStartNotion extends StoryNotion {
+  readonly #client: Client = new Client({ auth: env.notion.token });
 
   findChapters = async ({ storyId }: FindStoryChaptersOptions): Promise<Chapter.Instance[]> => {
     const result = await this.#client.databases.query({
-      database_id: notion.databases.chapters.id,
+      database_id: env.notion.databases.chapters.id,
       sorts: [
         {
           property: 'Index',
@@ -34,7 +34,7 @@ export class Notion extends StoryNotion {
     const chapters = chapterIds.map(id => ({ id }));
 
     await this.#client.pages.create({
-      parent: { database_id: notion.databases.readTrace.id },
+      parent: { database_id: env.notion.databases.readTrace.id },
       properties: {
         Name: {
           title: [
@@ -60,7 +60,7 @@ export class Notion extends StoryNotion {
           relation: chapters,
         },
         'Read Stats': {
-          relation: [{ id: notion.stats.read.id }],
+          relation: [{ id: env.notion.stats.read.id }],
         },
       },
     });

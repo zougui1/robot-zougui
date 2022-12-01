@@ -8,7 +8,7 @@ import { SelectMenuActionContext } from '../types';
 import { ProgramMiddleware } from '../../types';
 import { Reply } from '../../../Reply';
 
-const debug = createDebug('notion-trackers:command');
+const debug = createDebug('robot-zougui:command');
 
 export const executeAction = async (options: ExecuteActionOptions): Promise<void> => {
   const { interaction, action, values, middlewares } = options;

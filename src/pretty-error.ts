@@ -9,7 +9,7 @@ pe.skipNodeFiles();
 // regexes are also supported, but aren't in the type definition
 pe.alias(rePackageNamespace as any, '$1');
 // alias current dir
-pe.alias(__dirname, 'discord-notion-trackers');
+pe.alias(__dirname, 'discord-robot-zougui');
 // skip node internals
 pe.skip((e: any) => {
   const path = String(e?.dir || e?.path || e?.addr);

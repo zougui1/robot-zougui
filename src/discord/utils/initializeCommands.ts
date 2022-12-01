@@ -2,7 +2,7 @@ import { REST, ApplicationCommandDataResolvable, Routes } from 'discord.js';
 import _ from 'radash';
 import createDebug from 'debug';
 
-const debug = createDebug('notion-trackers:discord');
+const debug = createDebug('robot-zougui:discord');
 
 export const initializeCommands = async (rest: REST, clientId: string, commands: ApplicationCommandDataResolvable[]): Promise<InitializeCommandsResult> => {
   debug('Started refreshing application (/) commands.');

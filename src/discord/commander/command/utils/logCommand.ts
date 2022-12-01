@@ -2,7 +2,7 @@ import { ChatInputCommandInteraction } from 'discord.js';
 import createDebug from 'debug';
 import chalk from 'chalk';
 
-const debug = createDebug('notion-trackers:command');
+const debug = createDebug('robot-zougui:command');
 
 export const logCommand = async (options: LogCommandOptions): Promise<void> => {
   const { interaction, values, rawValues } = options;

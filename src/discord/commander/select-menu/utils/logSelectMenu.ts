@@ -1,7 +1,7 @@
 import createDebug from 'debug';
 import chalk from 'chalk';
 
-const debug = createDebug('notion-trackers:select-menu');
+const debug = createDebug('robot-zougui:select-menu');
 
 export const logSelectMenu = async (options: LogCommandOptions): Promise<void> => {
   const { values, selectMenuName } = options;

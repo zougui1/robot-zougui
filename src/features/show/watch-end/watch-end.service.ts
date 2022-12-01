@@ -1,28 +1,28 @@
 import { DateTime } from 'luxon';
 
-import { Notion } from './watch-end.notion';
+import { WatchEndNotion } from './watch-end.notion';
 import { WatchTrace } from '../watch-trace.model';
 import { getOnePage } from '../../../notion';
 import { getItemActionMessage } from '../../../utils';
 
-export class Service {
+export class WatchEndService {
   static readonly errorCodes = {
     showNotFound: 'ERR_SHOW_NOT_FOUND',
     showNotUnique: 'ERR_SHOW_NOT_UNIQUE',
   } as const;
 
-  #notion: Notion = new Notion();
+  readonly #notion: WatchEndNotion = new WatchEndNotion();
 
   findUniqueShow = async ({ name }: { name: string }): Promise<WatchTrace.Instance> => {
     const show = getOnePage(
       await this.#notion.findWatchingShows({ name }),
       {
         notFound: {
-          code: Service.errorCodes.showNotFound,
+          code: WatchEndService.errorCodes.showNotFound,
           message: () => `Could not find a show named "${name}". Maybe you are not currently watching it.`,
         },
         notUnique: {
-          code: Service.errorCodes.showNotUnique,
+          code: WatchEndService.errorCodes.showNotUnique,
           message: shows => `Cannot stop watching the show "${name}" as ${shows.length} shows with that name were found.`,
         },
       },

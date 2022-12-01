@@ -1,28 +1,28 @@
 import { DateTime } from 'luxon';
 
-import { Notion } from './read-end.notion';
+import { ReadEndNotion } from './read-end.notion';
 import { ReadTrace } from '../read-trace.model';
 import { getOnePage } from '../../../notion';
 import { getItemActionMessage } from '../../../utils';
 
-export class Service {
+export class ReadEndService {
   static readonly errorCodes = {
     storyNotFound: 'ERR_STORY_NOT_FOUND',
     storyNotUnique: 'ERR_STORY_NOT_UNIQUE',
   } as const;
 
-  #notion: Notion = new Notion();
+  readonly #notion: ReadEndNotion = new ReadEndNotion();
 
   findUniqueStory = async ({ name }: { name: string }): Promise<ReadTrace.Instance> => {
     const story = getOnePage(
       await this.#notion.findReadingStories({ name }),
       {
         notFound: {
-          code: Service.errorCodes.storyNotFound,
+          code: ReadEndService.errorCodes.storyNotFound,
           message: () => `Could not find a story named "${name}". Maybe you are not currently reading it.`,
         },
         notUnique: {
-          code: Service.errorCodes.storyNotUnique,
+          code: ReadEndService.errorCodes.storyNotUnique,
           message: stories => `Cannot stop reading the story "${name}" as ${stories.length} stories with that name were found.`,
         },
       },

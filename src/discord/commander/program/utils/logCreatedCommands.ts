@@ -4,7 +4,7 @@ import chalk from 'chalk';
 
 import { isChatInputCommand } from '../../../utils';
 
-const debug = createDebug('notion-trackers:discord');
+const debug = createDebug('robot-zougui:discord');
 
 export const logCreatedCommands = (commands: ApplicationCommandDataResolvable[]): void => {
   for (const command of commands) {

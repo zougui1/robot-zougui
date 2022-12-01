@@ -37,3 +37,6 @@ yarn-error.log*
 
 # env files
 *.env
+
+# test
+output/

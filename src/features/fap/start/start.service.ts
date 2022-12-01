@@ -2,12 +2,12 @@ import _ from 'radash';
 import { DateTime } from 'luxon';
 import createDebug from 'debug';
 
-import { Notion } from './start.notion';
+import { StartNotion } from './start.notion';
 
-const debug = createDebug('notion-trackers:fap:start:service');
+const debug = createDebug('robot-zougui:fap:start:service');
 
-export class Service {
-  #notion: Notion = new Notion();
+export class StartService {
+  readonly #notion: StartNotion = new StartNotion();
 
   createFap = async (options: { content?: string | undefined }): Promise<void> => {
     const date = DateTime.now();

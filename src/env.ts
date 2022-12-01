@@ -1,51 +1,63 @@
+import path from 'node:path';
+
 import { config } from 'dotenv';
 import env from 'env-var';
 
-config();
+config({
+  path: path.join(__dirname, '../.env'),
+});
 
-export const discord = {
-  token: env.get('DISCORD_TOKEN').required().asString(),
-  clientId: env.get('DISCORD_CLIENT_ID').required().asString(),
-  channelNames: env.get('DISCORD_CHANNEL_NAMES').required().asArray(','),
-  authorizedUserId: env.get('DISCORD_AUTHORIZED_USER_ID').required().asString(),
-};
+const getProdEnv = () => {
+  return {
+    networkAddress: env.get('COMMON.NETWORK_ADDRESS').required().asString(),
 
-export const notion = {
-  token: env.get('NOTION_TOKEN').required().asString(),
-  databases: {
-    fap: {
-      id: env.get('NOTION_DATABASE_FAP_ID').required().asString(),
+    discord: {
+      token: env.get('COMMON.DISCORD.TOKEN').required().asString(),
+      clientId: env.get('COMMON.DISCORD.CLIENT_ID').required().asString(),
+      channelId: env.get('COMMON.DISCORD.CHANNEL_ID').required().asString(),
+      authorizedUserId: env.get('COMMON.DISCORD.AUTHORIZED_USER_ID').required().asString(),
     },
-    shows: {
-      id: env.get('NOTION_DATABASE_SHOWS_ID').required().asString(),
-    },
-    seasons: {
-      id: env.get('NOTION_DATABASE_SEASONS_ID').required().asString(),
-    },
-    watchTrace: {
-      id: env.get('NOTION_DATABASE_WATCH_TRACE_ID').required().asString(),
-    },
-    stories: {
-      id: env.get('NOTION_DATABASE_STORIES_ID').required().asString(),
-    },
-    chapters: {
-      id: env.get('NOTION_DATABASE_CHAPTERS_ID').required().asString(),
-    },
-    readTrace: {
-      id: env.get('NOTION_DATABASE_READ_TRACE_ID').required().asString(),
-    },
-  },
-  stats: {
-    fapping: {
-      id: env.get('NOTION_STATS_FAPPING_ID').required().asString(),
-    },
-    read: {
-      id: env.get('NOTION_STATS_READ_ID').required().asString(),
-    },
-  },
-};
 
-export const music = {
-  dir: env.get('MUSIC_DIR').required().asString(),
-  tempDir: env.get('MUSIC_TEMP_DIR').required().asString(),
-};
+    notion: {
+      token: env.get('NOTION.TOKEN').required().asString(),
+      databases: {
+        fap: {
+          id: env.get('NOTION.DATABASE.FAP.ID').required().asString(),
+        },
+        shows: {
+          id: env.get('NOTION.DATABASE.SHOWS.ID').required().asString(),
+        },
+        seasons: {
+          id: env.get('NOTION.DATABASE.SEASONS.ID').required().asString(),
+        },
+        watchTrace: {
+          id: env.get('NOTION.DATABASE.WATCH_TRACE.ID').required().asString(),
+        },
+        stories: {
+          id: env.get('NOTION.DATABASE.STORIES.ID').required().asString(),
+        },
+        chapters: {
+          id: env.get('NOTION.DATABASE.CHAPTERS.ID').required().asString(),
+        },
+        readTrace: {
+          id: env.get('NOTION.DATABASE.READ_TRACE.ID').required().asString(),
+        },
+      },
+      stats: {
+        fapping: {
+          id: env.get('NOTION.STATS.FAPPING.ID').required().asString(),
+        },
+        read: {
+          id: env.get('NOTION.STATS.READ.ID').required().asString(),
+        },
+      },
+    },
+
+    music: {
+      dir: env.get('MUSIC.DIR').required().asString(),
+      tempDir: env.get('MUSIC.TEMP_DIR').required().asString(),
+    },
+  };
+}
+
+export default getProdEnv();

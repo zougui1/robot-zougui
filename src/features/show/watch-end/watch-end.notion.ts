@@ -6,10 +6,10 @@ import { ShowNotion } from '../show.notion';
 import { Season } from '../season.model';
 import { WatchTrace } from '../watch-trace.model';
 import { getFullPageList } from '../../../notion';
-import { notion } from '../../../env';
+import env from '../../../env';
 
-export class Notion extends ShowNotion {
-  #client: Client = new Client({ auth: notion.token });
+export class WatchEndNotion extends ShowNotion {
+  readonly #client: Client = new Client({ auth: env.notion.token });
 
   findSeasonsById = async ({ ids }: { ids: string[] }): Promise<Season.Instance[]> => {
     const responses = await _.parallel(ids.length, ids, async id => {
@@ -21,7 +21,7 @@ export class Notion extends ShowNotion {
 
   findWatchingShows = async ({ name }: { name: string }): Promise<WatchTrace.Instance[]> => {
     const result = await this.#client.databases.query({
-      database_id: notion.databases.watchTrace.id,
+      database_id: env.notion.databases.watchTrace.id,
       filter: {
         and: [
           {

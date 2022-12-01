@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon';
 
-import { Notion } from './read-start.notion';
+import { ReadStartNotion } from './read-start.notion';
 import { Story } from '../story.model';
 import { Chapter } from '../chapter.model';
 import { getOnePage } from '../../../notion';
@@ -12,13 +12,13 @@ import {
 
 const chaptersCache = new EphemeralCache<Promise<Chapter.Instance[]>>({ timeout: 15000 });
 
-export class Service {
+export class ReadStartService {
   static readonly errorCodes = {
     storyNotFound: 'ERR_STORY_NOT_FOUND',
     storyNotUnique: 'ERR_STORY_NOT_UNIQUE',
   } as const;
 
-  #notion: Notion = new Notion();
+  readonly #notion: ReadStartNotion = new ReadStartNotion();
 
   findChapters = chaptersCache.wrap(async ({ name }: { name: string }): Promise<Chapter.Instance[]> => {
     const story = await this.findUniqueStory({ name });
@@ -30,11 +30,11 @@ export class Service {
       await this.#notion.getStoryList({ name, reading: false, nameComparison: 'equals' }),
       {
         notFound: {
-          code: Service.errorCodes.storyNotFound,
+          code: ReadStartService.errorCodes.storyNotFound,
           message: () => `Could not find a story named "${name}". Maybe you are already reading it.`,
         },
         notUnique: {
-          code: Service.errorCodes.storyNotUnique,
+          code: ReadStartService.errorCodes.storyNotUnique,
           message: storys => `Cannot start reading the story "${name}" as ${storys.length} stories with that name were found.`,
         },
       },

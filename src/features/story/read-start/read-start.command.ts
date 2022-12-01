@@ -1,4 +1,4 @@
-import { Service } from './read-start.service';
+import { ReadStartService } from './read-start.service';
 import { chaptersOption } from './options';
 import { createNameOption } from '../options';
 import { Command } from '../../../discord';
@@ -8,7 +8,7 @@ export const subCommandReadStart = new Command('read-start')
   .addOption(createNameOption({ reading: false }))
   .addOption(chaptersOption)
   .action(async ({ options, reply }) => {
-    const service = new Service();
+    const service = new ReadStartService();
 
     const result = await service.startReadingStory({
       name: options.name,

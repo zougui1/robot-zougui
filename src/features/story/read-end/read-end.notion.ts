@@ -6,10 +6,10 @@ import { StoryNotion } from '../story.notion';
 import { Chapter } from '../chapter.model';
 import { ReadTrace } from '../read-trace.model';
 import { getFullPageList } from '../../../notion';
-import { notion } from '../../../env';
+import env from '../../../env';
 
-export class Notion extends StoryNotion {
-  #client: Client = new Client({ auth: notion.token });
+export class ReadEndNotion extends StoryNotion {
+  readonly #client: Client = new Client({ auth: env.notion.token });
 
   findChaptersById = async ({ ids }: { ids: string[] }): Promise<Chapter.Instance[]> => {
     const responses = await _.parallel(ids.length, ids, async id => {
@@ -21,7 +21,7 @@ export class Notion extends StoryNotion {
 
   findReadingStories = async ({ name }: { name: string }): Promise<ReadTrace.Instance[]> => {
     const result = await this.#client.databases.query({
-      database_id: notion.databases.readTrace.id,
+      database_id: env.notion.databases.readTrace.id,
       filter: {
         and: [
           {

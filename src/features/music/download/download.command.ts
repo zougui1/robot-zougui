@@ -16,14 +16,6 @@ const playlistOption = new Option('<playlist>')
     return await service.getPlaylistNamesSuggestions({ search: value });
   });
 
-// TODO REFACTO
-// TODO REFACTO
-// TODO REFACTO
-// TODO REFACTO
-// TODO REFACTO
-// TODO REFACTO
-// TODO REFACTO
-
 export const subCommandDownload = new Command('download')
   .description('Download a music from a URL')
   .option('<url>', 'URL from which to download a music', {

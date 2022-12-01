@@ -3,7 +3,7 @@ import createDebug from 'debug';
 
 import { Command, CommandMap } from '../../command';
 
-const debug = createDebug('notion-trackers:discord');
+const debug = createDebug('robot-zougui:discord');
 
 export const findCommand = (interaction: Interaction, commands: CommandMap): Command | undefined => {
   const command = commands.get(interaction.commandName);

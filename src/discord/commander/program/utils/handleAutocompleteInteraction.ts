@@ -6,7 +6,7 @@ import chalk from 'chalk';
 import { findCommand } from './findCommand';
 import { CommandMap } from '../../command';
 
-const debug = createDebug('notion-trackers:discord:autocompletion');
+const debug = createDebug('robot-zougui:discord:autocompletion');
 const maxOptions = 25;
 
 export const handleAutocompleteInteraction = async (interaction: AutocompleteInteraction, commands: CommandMap): Promise<void> => {

@@ -2,12 +2,12 @@ import { DateTime } from 'luxon';
 import { Client } from '@notionhq/client';
 import createDebug from 'debug';
 
-import { notion } from '../../../env';
+import env from '../../../env';
 
-const debug = createDebug('notion-trackers:fap:start:notion');
+const debug = createDebug('robot-zougui:fap:start:notion');
 
-export class Notion {
-  #client: Client = new Client({ auth: notion.token });
+export class StartNotion {
+  readonly #client: Client = new Client({ auth: env.notion.token });
 
   createFap = async ({ date, content }: CreateFapOptions): Promise<void> => {
     debug(content ? `create fap with content "${content}"` : 'create fap');
@@ -21,7 +21,7 @@ export class Notion {
     };
 
     await this.#client.pages.create({
-      parent: { database_id: notion.databases.fap.id },
+      parent: { database_id: env.notion.databases.fap.id },
       properties: {
         ...(contentUpdateObject || {}),
         Name: {
@@ -39,7 +39,7 @@ export class Notion {
           },
         },
         'Fapping Stats': {
-          relation: [{ id: notion.stats.fapping.id }],
+          relation: [{ id: env.notion.stats.fapping.id }],
         },
       },
     });

@@ -1,7 +1,7 @@
 import { ShowNotion } from './show.notion';
 
 export class ShowService {
-  #notion: ShowNotion = new ShowNotion();
+  readonly #notion: ShowNotion = new ShowNotion();
 
   findMatchingShowNames = async ({ name, watching }: FindMatchingShowNamesOptions): Promise<string[]> => {
     const shows = await this.#notion.getShowList({ name, watching, nameComparison: 'contains' });

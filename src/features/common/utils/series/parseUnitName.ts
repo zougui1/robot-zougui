@@ -1,5 +1,3 @@
-import { safeSplit } from '../../../../utils';
-
 const reIndex = /^[a-z][0-9]+$/i;
 const reUnitNameSeparators = /[;:]/;
 
@@ -8,25 +6,13 @@ const reUnitNameSeparators = /[;:]/;
  * - {unitName}
  * - {seriesName}; [A-Z]{unitIndex}
  * - {seriesName}; [A-Z]{unitIndex}: {unitName}
+ * - {seriesName}: {unitName}; [A-Z]{unitIndex}
  */
 export const parseUnitName = (name: string, text: string): string | undefined => {
-  const [
-    seriesOrUnitName,
-    dirtyIndexOrName,
-    maybeUnitName,
-  ] = safeSplit(text, reUnitNameSeparators, 3);
+  const parts = text.split(reUnitNameSeparators);
 
-  if (maybeUnitName?.trim()) {
-    return maybeUnitName;
-  }
-
-  const indexOrName = dirtyIndexOrName?.trim();
-
-  if (indexOrName && !reIndex.test(indexOrName)) {
-    return indexOrName;
-  }
-
-  if (!seriesOrUnitName.includes(name)) {
-    return seriesOrUnitName;
-  }
+  return parts.find(part => {
+    part = part.trim();
+    return part && !reIndex.test(part) && !part.includes(name);
+  });
 }

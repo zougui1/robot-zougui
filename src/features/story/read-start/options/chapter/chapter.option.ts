@@ -1,4 +1,4 @@
-import { Service } from '../../read-start.service';
+import { ReadStartService } from '../../read-start.service';
 import { findUnitsSuggestions } from '../../../../common/utils';
 import { Option } from '../../../../../discord';
 import { parseListableNumber } from '../../../../../utils';
@@ -7,7 +7,7 @@ export const chaptersOption = new Option('[chapters]')
   .description('Choose the chapters you are going to read')
   .autocomplete(async ({ value, interaction }) => {
     const storyName = interaction.options.getString('name', true);
-    const service = new Service();
+    const service = new ReadStartService();
     const chapters = await service.findChapters({ name: storyName });
 
     return findUnitsSuggestions(chapters, {

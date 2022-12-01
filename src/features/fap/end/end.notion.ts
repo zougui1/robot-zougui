@@ -5,18 +5,18 @@ import createDebug from 'debug';
 
 import { Fap } from '../fap.model';
 import { getFullPageList } from '../../../notion';
-import { notion } from '../../../env';
+import env from '../../../env';
 
-const debug = createDebug('notion-trackers:fap:end:notion');
+const debug = createDebug('robot-zougui:fap:end:notion');
 
-export class Notion {
-  #client: Client = new Client({ auth: notion.token });
+export class EndNotion {
+  readonly #client: Client = new Client({ auth: env.notion.token });
 
   getFaps = async (): Promise<Fap.Instance[]> => {
     debug('get faps');
 
     const response = await this.#client.databases.query({
-      database_id: notion.databases.fap.id,
+      database_id: env.notion.databases.fap.id,
       sorts: [
         {
           property: 'Date',

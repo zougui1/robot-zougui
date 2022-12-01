@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon';
 
-import { Notion } from './watch-start.notion';
+import { WatchStartNotion } from './watch-start.notion';
 import { Show } from '../show.model';
 import { Season } from '../season.model';
 import { getOnePage } from '../../../notion';
@@ -12,13 +12,13 @@ import {
 
 const seasonsCache = new EphemeralCache<Promise<Season.Instance[]>>({ timeout: 15000 });
 
-export class Service {
+export class WatchStartService {
   static readonly errorCodes = {
     showNotFound: 'ERR_SHOW_NOT_FOUND',
     showNotUnique: 'ERR_SHOW_NOT_UNIQUE',
   } as const;
 
-  #notion: Notion = new Notion();
+  readonly #notion: WatchStartNotion = new WatchStartNotion();
 
   findSeasons = seasonsCache.wrap(async ({ name }: { name: string }): Promise<Season.Instance[]> => {
     const show = await this.findUniqueShow({ name });
@@ -30,11 +30,11 @@ export class Service {
       await this.#notion.getShowList({ name, watching: false, nameComparison: 'equals' }),
       {
         notFound: {
-          code: Service.errorCodes.showNotFound,
+          code: WatchStartService.errorCodes.showNotFound,
           message: () => `Could not find a show named "${name}". Maybe you are already watching it.`,
         },
         notUnique: {
-          code: Service.errorCodes.showNotUnique,
+          code: WatchStartService.errorCodes.showNotUnique,
           message: shows => `Cannot start watching the show "${name}" as ${shows.length} shows with that name were found.`,
         },
       },

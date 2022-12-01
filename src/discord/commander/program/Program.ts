@@ -10,7 +10,7 @@ import { ProgramMiddleware } from '../types';
 import { initializeCommands, } from '../../utils';
 import { onceProgramExit } from '../../../utils';
 
-const debug = createDebug('notion-trackers:discord');
+const debug = createDebug('robot-zougui:discord');
 
 export class Program {
   readonly commands: CommandMap = new CommandMap();
@@ -52,6 +52,11 @@ export class Program {
   async parse(): Promise<void> {
     this.#client.login(this.#token);
     await this._initializeCommands();
+  }
+
+  destroy(): void {
+    this.selectMenus.destroy();
+    this.#client.destroy();
   }
 
   //#region private methods

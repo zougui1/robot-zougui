@@ -141,6 +141,10 @@ export class SelectMenu<Options extends Record<string, string>> {
     reply.respondError('Could not perform this action');
   }
 
+  destroy(): void {
+    this.#cache.destroy();
+  }
+
   private resolveAliasedOptions = (aliasedOptions: any): any => {
     const options = Object.entries(aliasedOptions).reduce((options, [aliasName, value]) => {
       const alias = this.#aliases[aliasName];

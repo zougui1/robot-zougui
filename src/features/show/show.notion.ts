@@ -2,19 +2,19 @@ import { Client } from '@notionhq/client';
 import createDebug from 'debug';
 
 import { Show } from './show.model';
-import { notion } from '../../env';
+import env from '../../env';
 import { getFullPageList } from '../../notion';
 
-const debug = createDebug('notion-trackers:watch:notion');
+const debug = createDebug('robot-zougui:watch:notion');
 
 export class ShowNotion {
-  #client: Client = new Client({ auth: notion.token });
+  readonly #client: Client = new Client({ auth: env.notion.token });
 
   getShowList = async ({ name, watching, nameComparison }: GetShowListOptions): Promise<Show.Instance[]> => {
     debug(`Find the show "${name}" with status watching=${watching}`);
 
     const result = await this.#client.databases.query({
-      database_id: notion.databases.shows.id,
+      database_id: env.notion.databases.shows.id,
       sorts: [
         {
           property: 'Name',

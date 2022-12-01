@@ -1,7 +1,7 @@
 import { StoryNotion } from './story.notion';
 
 export class StoryService {
-  #notion: StoryNotion = new StoryNotion();
+  readonly #notion: StoryNotion = new StoryNotion();
 
   findMatchingStoryNames = async ({ name, reading }: FindMatchingStoryNamesOptions): Promise<string[]> => {
     const storys = await this.#notion.getStoryList({ name, reading, nameComparison: 'contains' });

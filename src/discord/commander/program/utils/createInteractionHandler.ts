@@ -8,7 +8,7 @@ import { handleAutocompleteInteraction } from './handleAutocompleteInteraction';
 import { CommandMap } from '../../command';
 import { SelectMenuMap } from '../../select-menu';
 
-const debug = createDebug('notion-trackers:discord:interaction');
+const debug = createDebug('robot-zougui:discord:interaction');
 
 export const createInteractionHandler = (commands: CommandMap, selectMenus: SelectMenuMap) => async (interaction: Interaction): Promise<void> => {
   try {

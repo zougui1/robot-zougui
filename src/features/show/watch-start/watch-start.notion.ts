@@ -4,15 +4,15 @@ import { DateTime } from 'luxon';
 
 import { ShowNotion } from '../show.notion';
 import { Season } from '../season.model';
-import { notion } from '../../../env';
+import env from '../../../env';
 import { getFullPageList } from '../../../notion';
 
-export class Notion extends ShowNotion {
-  #client: Client = new Client({ auth: notion.token });
+export class WatchStartNotion extends ShowNotion {
+  readonly #client: Client = new Client({ auth: env.notion.token });
 
   findSeasons = async ({ showId }: FindShowSeasonsOptions): Promise<Season.Instance[]> => {
     const result = await this.#client.databases.query({
-      database_id: notion.databases.seasons.id,
+      database_id: env.notion.databases.seasons.id,
       sorts: [
         {
           property: 'Index',
@@ -34,7 +34,7 @@ export class Notion extends ShowNotion {
     const seasons = seasonIds.map(id => ({ id }));
 
     await this.#client.pages.create({
-      parent: { database_id: notion.databases.watchTrace.id },
+      parent: { database_id: env.notion.databases.watchTrace.id },
       properties: {
         Name: {
           title: [

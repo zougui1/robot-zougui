@@ -3,13 +3,13 @@ import { DateTime } from 'luxon';
 import createDebug from 'debug';
 
 import { findUnfinishedFap } from './utils';
-import { Notion } from './end.notion';
+import { EndNotion } from './end.notion';
 import { Fap } from '../fap.model';
 
-const debug = createDebug('notion-trackers:fap:end:service');
+const debug = createDebug('robot-zougui:fap:end:service');
 
-export class Service {
-  #notion: Notion = new Notion();
+export class EndService {
+  readonly #notion: EndNotion = new EndNotion();
 
   finishLastFap = async (options: { content?: string | undefined }): Promise<void> => {
     const endDate = DateTime.now();
