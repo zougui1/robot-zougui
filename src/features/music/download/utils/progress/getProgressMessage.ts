@@ -1,50 +1,93 @@
-import { Progress, DownloadState } from '@zougui/common.music-repo/lib/youtube/downloader/parser';
+import { PartialDeep } from 'type-fest';
 
-import { compact } from '../../../../../utils';
+import { DownloadState } from '@zougui/common.music-repo/lib/youtube/downloader/parser';
 
-const icons = {
-  success: '✅',
-  error: '❌',
-  running: '<a:loading:1046427341120880690>',
-}
+import { ProcessProgress, StepMessage } from '../../../../../utils';
+import env from '../../../../../env';
 
-const labels = {
+const errorMessage: StepMessage = {
+  icon: env.discord.icons.error,
+  content: 'An error occured',
+};
+
+const staticSteps = {
   downloadingWebpage: {
     title: 'Downloading webpage',
-    success: 'Downloaded',
-    running: 'Downloading',
+    success: {
+      icon: env.discord.icons.success,
+      content: 'Downloaded',
+    },
+    running: {
+      icon: env.discord.icons.running,
+      content: 'Downloading...',
+    },
+    error: errorMessage,
   },
 
   downloadingThumbnail: {
     title: 'Downloading thumbnail',
-    success: 'Downloaded',
-    running: 'Downloading',
+    success: {
+      icon: env.discord.icons.success,
+      content: 'Downloaded',
+    },
+    running: {
+      icon: env.discord.icons.running,
+      content: 'Downloading...',
+    },
+    error: errorMessage,
   },
 
   writingThumbnail: {
     title: 'Writing thumbnail',
-    success: 'Written',
-    running: 'Writing',
+    success: {
+      icon: env.discord.icons.success,
+      content: 'Written',
+    },
+    running: {
+      icon: env.discord.icons.running,
+      content: 'Writing...',
+    },
+    error: errorMessage,
   },
 
   downloadingFile: {
     title: 'Downloading file',
-    success: 'Downloaded',
-    running: 'Downloading',
+    success: {
+      icon: env.discord.icons.success,
+      content: 'Downloaded',
+    },
+    running: {
+      icon: env.discord.icons.running,
+    },
+    error: errorMessage,
   },
 
   addingMetadata: {
     title: 'Adding metadata',
-    success: 'Added',
-    running: 'Adding',
+    success: {
+      icon: env.discord.icons.success,
+      content: 'Added',
+    },
+    running: {
+      icon: env.discord.icons.running,
+      content: 'Adding...',
+    },
+    error: errorMessage,
   },
 
   addingThumbnail: {
     title: 'Adding thumbnail',
-    success: 'Added',
-    running: 'Adding',
+    success: {
+      icon: env.discord.icons.success,
+      content: 'Added',
+    },
+    running: {
+      icon: env.discord.icons.running,
+      content: 'Adding...',
+    },
+    error: errorMessage,
   },
-} satisfies Record<string, Label>;
+} satisfies Record<string, PartialDeep<StaticStepOptions>>;
 
 export const getProgressMessage = (state: DownloadState, errored?: true): string => {
   const {
@@ -56,68 +99,48 @@ export const getProgressMessage = (state: DownloadState, errored?: true): string
     addingThumbnail,
   } = state;
 
-  const lines = compact([
-    getMessage(true, downloadingWebpage, labels.downloadingWebpage, errored),
-    getMessage(downloadingWebpage, downloadingThumbnail, labels.downloadingThumbnail, errored),
-    getMessage(downloadingThumbnail, writingThumbnail, labels.writingThumbnail, errored),
-    getProgress(fileDownloadProgress, labels.downloadingFile, errored),
-    getMessage(!!fileDownloadProgress?.isDone(), addingMetadata, labels.addingMetadata, errored),
-    getMessage(addingMetadata, addingThumbnail, labels.addingThumbnail, errored),
-  ]);
+  const progress = new ProcessProgress()
+    .addStep({
+      ...staticSteps.downloadingWebpage,
+      done: downloadingWebpage,
+      errored: Boolean(errored),
+    })
+    .addStep({
+      ...staticSteps.downloadingThumbnail,
+      done: downloadingThumbnail,
+      errored: Boolean(errored),
+    })
+    .addStep({
+      ...staticSteps.writingThumbnail,
+      done: writingThumbnail,
+      errored: Boolean(errored),
+    })
+    .addStep({
+      ...staticSteps.downloadingFile,
+      running: {
+        ...staticSteps.downloadingFile.running,
+        content: fileDownloadProgress?.toString() || '',
+      },
+      done: Boolean(fileDownloadProgress?.isDone()),
+      errored: Boolean(errored),
+    })
+    .addStep({
+      ...staticSteps.addingMetadata,
+      done: addingMetadata,
+      errored: Boolean(errored),
+    })
+    .addStep({
+      ...staticSteps.addingThumbnail,
+      done: addingThumbnail,
+      errored: Boolean(errored),
+    })
 
-  return lines.join('\n');
+  return progress.toString();
 }
 
-const getMessage = (previousStepDone: boolean, done: boolean, label: Label, errored: boolean | undefined): string | undefined => {
-  if (!previousStepDone) {
-    return;
-  }
-
-  const messages = {
-    success: `${icons.success} ${label.success}`,
-    running: `${icons.running} ${label.running}...`,
-    error: `${icons.error} An error occured`,
-  };
-  const message = getStatusMessage(messages, done, errored);
-
-  return `${label.title}: ${message}`;
-}
-
-interface Label {
+type StaticStepOptions = {
   title: string;
-  success: string;
-  running: string;
-}
-
-const getProgress = (progress: Progress | undefined, label: Omit<Label, 'running'>, errored: boolean | undefined): string | undefined => {
-  if (!progress) {
-    return;
-  }
-
-  const messages = {
-    success: `${icons.success} ${label.success}`,
-    running: progress.toString(),
-    error: `${icons.error} An error occured`,
-  };
-  const message = getStatusMessage(messages, progress.isDone(), errored);
-
-  return `${label.title}: ${message}`;
-}
-
-const getStatusMessage = (label: StatusLabels, done: boolean, errored: boolean | undefined): string => {
-  if (done) {
-    return label.success;
-  }
-
-  if (errored) {
-    return label.error;
-  }
-
-  return label.running;
-}
-
-interface StatusLabels {
-  success: string;
-  error: string;
-  running: string;
+  success: StepMessage;
+  running: StepMessage;
+  error: StepMessage;
 }

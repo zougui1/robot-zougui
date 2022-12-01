@@ -16,6 +16,12 @@ const getProdEnv = () => {
       clientId: env.get('DISCORD.CLIENT_ID').required().asString(),
       channelId: env.get('DISCORD.CHANNEL_ID').required().asString(),
       authorizedUserId: env.get('DISCORD.AUTHORIZED_USER_ID').required().asString(),
+
+      icons: {
+        success: env.get('DISCORD.ICONS.SUCCESS').required().asString(),
+        running: env.get('DISCORD.ICONS.RUNNING').required().asString(),
+        error: env.get('DISCORD.ICONS.ERROR').required().asString(),
+      },
     },
 
     notion: {
