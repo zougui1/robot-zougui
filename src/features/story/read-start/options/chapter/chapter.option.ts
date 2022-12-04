@@ -8,7 +8,7 @@ export const chaptersOption = new Option('[chapters]')
   .autocomplete(async ({ value, interaction }) => {
     const storyName = interaction.options.getString('name', true);
     const service = new ReadStartService();
-    const chapters = await service.findChapters({ name: storyName });
+    const chapters = await service.findNotReadingChapters({ name: storyName });
 
     return findUnitsSuggestions(chapters, {
       search: value,

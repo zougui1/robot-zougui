@@ -1,8 +1,9 @@
 import { EPub } from 'epub2';
 import { compile } from 'html-to-text';
-import { wordChunks, wordCount } from 'split-word';
 import fs from 'fs/promises';
 import path from 'path';
+
+import { splitWords } from './utils';
 
 const file = '/mnt/Manjaro_Data/zougui/Downloads/The Desert Blade - by Raevocrei.epub';
 const outputDir = path.join(__dirname, '../output');
@@ -30,7 +31,7 @@ const removePrefix = (text: string, prefix: string, insensitive: boolean = false
       console.time('remove prefix')
       const textWithoutTitle = removePrefix(text, chapter.title || '', true);
       console.timeEnd('remove prefix')
-      const chunks = wordChunks(textWithoutTitle);
+      const chunks = splitWords(textWithoutTitle);
       //const count = wordCount(text);
       const count = chunks.filter((word: string) => /[a-zA-Z]/.test(word)).length;
 

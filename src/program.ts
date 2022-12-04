@@ -3,6 +3,7 @@ import createDebug from 'debug';
 
 import './pretty-error';
 import { Program } from './discord';
+import { Furaffinity } from './furaffinity';
 import { fapCommand } from './features/fap';
 import { showCommand } from './features/show';
 import { storyCommand } from './features/story';
@@ -35,6 +36,7 @@ const createProgram = async (): Promise<Program> => {
   program.addSelectMenu(musicNamingSelectMenu);
 
   await program.parse();
+  Furaffinity.login(env.furaffinity.cookie.a, env.furaffinity.cookie.b);
 
   const guildList = await client.guilds.fetch();
   const { channelIds } = env.discord;

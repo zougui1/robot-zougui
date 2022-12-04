@@ -97,6 +97,13 @@ export class Reply {
     return this;
   }
 
+  async defer(): Promise<Message<boolean>> {
+    this.#replied = true;
+    return await this.#queue.run(() => this.#interaction.deferReply({
+      fetchReply: true,
+    }));
+  }
+
   async reply(): Promise<Message<boolean>> {
     if (this.debug) {
       this.message.reply.content ||= '*No content*';

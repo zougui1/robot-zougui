@@ -45,7 +45,7 @@ export class DownloadService {
 
     const downloader = Youtube.downloadAudio(url, {
       trackNumber: Music.stringifyTrackNumber(newTrackNumber),
-      outputDir: env.music.tempDir,
+      outputDir: env.tempDir,
     });
 
     let lastState: DownloadState | undefined;

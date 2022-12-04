@@ -4,6 +4,7 @@ export const Chapter = createModel({
   properties: {
     Name: Property.Title,
     Index: Property.Number,
+    URL: Property.Url,
   },
 });
 

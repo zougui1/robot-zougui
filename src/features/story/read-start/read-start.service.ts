@@ -1,50 +1,15 @@
 import { DateTime } from 'luxon';
 
 import { ReadStartNotion } from './read-start.notion';
-import { Story } from '../story.model';
+import { StoryService } from '../story.service';
 import { Chapter } from '../chapter.model';
 import { FapContentType } from '../../fap';
 import { StartService } from '../../fap/start/start.service';
-import { getOnePage } from '../../../notion';
-import {
-  EphemeralCache,
-  filterPagesByNumbers,
-  getItemActionMessage,
-} from '../../../utils';
+import { filterPagesByNumbers, getItemActionMessage } from '../../../utils';
 
-const chaptersCache = new EphemeralCache<Promise<Chapter.Instance[]>>({ timeout: 15000 });
-
-export class ReadStartService {
-  static readonly errorCodes = {
-    storyNotFound: 'ERR_STORY_NOT_FOUND',
-    storyNotUnique: 'ERR_STORY_NOT_UNIQUE',
-  } as const;
-
+export class ReadStartService extends StoryService {
   readonly #notion: ReadStartNotion = new ReadStartNotion();
   readonly #fapStartService: StartService = new StartService();
-
-  findChapters = chaptersCache.wrap(async ({ name }: { name: string }): Promise<Chapter.Instance[]> => {
-    const story = await this.findUniqueStory({ name });
-    return await this.#notion.findChapters({ storyId: story.id });
-  });
-
-  findUniqueStory = async ({ name }: { name: string }): Promise<Story.Instance> => {
-    const story = getOnePage(
-      await this.#notion.getStoryList({ name, reading: false, nameComparison: 'equals' }),
-      {
-        notFound: {
-          code: ReadStartService.errorCodes.storyNotFound,
-          message: () => `Could not find a story named "${name}". Maybe you are already reading it.`,
-        },
-        notUnique: {
-          code: ReadStartService.errorCodes.storyNotUnique,
-          message: storys => `Cannot start reading the story "${name}" as ${storys.length} stories with that name were found.`,
-        },
-      },
-    );
-
-    return story;
-  }
 
   startReadingStory = async (options: StartReadingStoryOptions): Promise<StartReadingStoryResult> => {
     const { name, chapters: chapterNumbers, date, fap } = options;
@@ -70,9 +35,22 @@ export class ReadStartService {
     };
   }
 
+  findNotReadingChapters = async ({ name }: { name: string }): Promise<Chapter.Instance[]> => {
+    return await this.findChapters({
+      name,
+      reading: false,
+      errorMessages: {
+        notFound: () => `Could not find a story named "${name}". Maybe you are already reading it.`,
+        notUnique: stories => `Cannot start reading the story "${name}" as ${stories.length} stories with that name were found.`,
+      },
+    });
+  }
+
   private async _startReadingStory(options: StartReadingStoryOptions): Promise<void> {
     const { name, chapters: chapterNumbers, date } = options;
-    const allChapters = await this.findChapters({ name });
+    const allChapters = await this.findNotReadingChapters({
+      name,
+    });
 
     const chapters = filterPagesByNumbers(
       allChapters,

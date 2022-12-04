@@ -12,3 +12,6 @@ export * from './Cache';
 export * from './Network';
 export * from './process-progress';
 export * from './Queue';
+export * from './file';
+export * from './string';
+export * from './url';

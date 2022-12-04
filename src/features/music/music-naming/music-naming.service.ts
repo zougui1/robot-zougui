@@ -39,7 +39,7 @@ export class MusicNamingService {
   }
 
   private async getFilePath(options: MusicOptions): Promise<string> {
-    const filePath = path.join(env.music.tempDir, options.fileName);
+    const filePath = path.join(env.tempDir, options.fileName);
     const doesFileExist = await fs.pathExists(filePath);
 
     if (!doesFileExist) {

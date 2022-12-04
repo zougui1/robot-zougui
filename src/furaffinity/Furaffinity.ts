@@ -7,7 +7,7 @@ import {
 } from './utils';
 
 export class Furaffinity {
-  static #loggedIn: boolean = true;
+  static #loggedIn: boolean = false;
 
   static login(cookieA: string, cookieB: string): void {
     if (this.#loggedIn) {

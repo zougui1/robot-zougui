@@ -1,6 +1,6 @@
 {
   "name": "@zougui/robot-zougui",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -38,7 +38,10 @@
     "@notionhq/client": "^2.2.2",
     "@zougui/common.ms": "^0.2.0",
     "@zougui/common.music-repo": "^0.3.0",
-    "@zougui/common.url-utils": "^0.1.2",
+    "@zougui/common.string-utils": "^0.2.0",
+    "@zougui/common.url-utils": "^0.2.0",
+    "any-text": "^1.2.0",
+    "axios": "^1.2.0",
     "chalk": "4",
     "debug": "^4.3.4",
     "discord.js": "^14.6.0",
@@ -55,8 +58,6 @@
     "nanoid": "^3.3.4",
     "pretty-error": "^4.0.0",
     "radash": "^9.0.2",
-    "split-word": "^1.0.1",
-    "split-words": "^1.0.2",
     "yaml": "^2.1.3",
     "zod": "^3.19.1"
   }

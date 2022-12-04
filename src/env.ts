@@ -14,6 +14,7 @@ const getProdEnv = () => {
 
   return {
     networkAddress: env.get('NETWORK_ADDRESS').required().asString(),
+    tempDir: env.get('TEMP_DIR').required().asString(),
 
     discord: {
       token: env.get('DISCORD.TOKEN').required().asString(),
@@ -69,7 +70,6 @@ const getProdEnv = () => {
 
     music: {
       dir: env.get('MUSIC.DIR').required().asString(),
-      tempDir: env.get('MUSIC.TEMP_DIR').required().asString(),
     },
 
     furaffinity: {

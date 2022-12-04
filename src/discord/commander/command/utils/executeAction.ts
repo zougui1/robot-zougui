@@ -12,8 +12,16 @@ import { onceProgramExit } from '../../../../utils';
 
 const debug = createDebug('robot-zougui:command');
 
+const camelAll = (object: Record<string, unknown>): Record<string, unknown> => {
+  return Object.entries(object).reduce((obj, [key, value]) => {
+    obj[_.camel(key)] = value;
+    return obj;
+  }, {} as Record<string, unknown>);
+}
+
 export const executeAction = async (options: ExecuteActionOptions): Promise<void> => {
-  const { interaction, action, values, middlewares } = options;
+  const { interaction, action, middlewares } = options;
+  const values = camelAll(options.values);
 
   logCommand(options);
   const reply = new Reply(interaction, { debug: options.debug });

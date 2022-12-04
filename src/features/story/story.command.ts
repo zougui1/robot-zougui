@@ -1,6 +1,6 @@
 import { subCommandReadStart } from './read-start';
 import { subCommandReadEnd } from './read-end';
-import { subCommandCreateChapter } from './create';
+import { subCommandCreateChapter } from './create-chapter';
 import { Command } from '../../discord';
 
 export const storyCommand = new Command('story').description('Story command');
