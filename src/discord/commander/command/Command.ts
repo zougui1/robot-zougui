@@ -11,9 +11,9 @@ import { OptionMap } from './OptionMap';
 import { CommandMap } from './CommandMap';
 import { executeAction } from './utils';
 import { defaultOptions, DefaultOptions } from './defaultOptions';
-import { ParseOption, OptionOptions, ActionContext } from './types';
+import { ParseOption, OptionOptions, ActionContext, CommandMiddleware } from './types';
 import { Option, AnyOption, OutputSchema } from '../option';
-import { FindOptionSchema, OptionString, ProgramMiddleware } from '../types';
+import { FindOptionSchema, OptionString } from '../types';
 import { getRawInteractionOptions } from '../../utils';
 
 export class Command<Options extends Record<string, unknown> = DefaultOptions> {
@@ -22,7 +22,7 @@ export class Command<Options extends Record<string, unknown> = DefaultOptions> {
   _description: string = '';
   readonly options: OptionMap = new OptionMap();
   #action: ((context: ActionContext<Options>) => void | Promise<void>) | undefined;
-  #middlewares: ProgramMiddleware[] = [];
+  #middlewares: CommandMiddleware[] = [];
 
   constructor(name: string = 'lib') {
     this.name = name;
@@ -133,8 +133,18 @@ export class Command<Options extends Record<string, unknown> = DefaultOptions> {
     };
   }
 
-  addMiddlewares = (middlewares: ProgramMiddleware[]): this => {
-    this.#middlewares = middlewares;
+  use(middleware: CommandMiddleware): this {
+    this.#middlewares.push(middleware);
+
+    for (const command of this.commands.asArray()) {
+      command.use(middleware);
+    }
+
+    return this;
+  }
+
+  addMiddlewares = (middlewares: CommandMiddleware[]): this => {
+    this.#middlewares.push(...middlewares);
 
     for (const command of this.commands.asArray()) {
       command.addMiddlewares(middlewares);

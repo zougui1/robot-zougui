@@ -28,9 +28,9 @@ export const subCommandDownload = new Command('download')
     const result = await service.downloadMusic({
       url: options.url,
       playlistName: options.playlist,
-      onProgress: _.throttle({ interval: 100 }, async progress => {
+      onProgress: async progress => {
         await reply.sendContent(progress);
-      }),
+      },
     });
 
     const optionalOptions: { value: string; label: string }[] = [];

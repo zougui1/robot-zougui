@@ -4,8 +4,7 @@ import createDebug from 'debug';
 import chalk from 'chalk';
 
 import { logSelectMenu } from './logSelectMenu';
-import { SelectMenuActionContext } from '../types';
-import { ProgramMiddleware } from '../../types';
+import { SelectMenuActionContext, SelectMenuMiddleware } from '../types';
 import { Reply } from '../../../Reply';
 
 const debug = createDebug('robot-zougui:command');
@@ -39,5 +38,5 @@ export interface ExecuteActionOptions {
   selectMenuName: string;
   values: Record<string, string>;
   action: (context: SelectMenuActionContext<Record<string, string>>) => void | Promise<void>;
-  middlewares: ProgramMiddleware[];
+  middlewares: SelectMenuMiddleware[];
 }

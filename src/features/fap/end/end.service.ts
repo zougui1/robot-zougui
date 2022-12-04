@@ -2,6 +2,8 @@ import _ from 'radash';
 import { DateTime } from 'luxon';
 import createDebug from 'debug';
 
+import { ms } from '@zougui/common.ms';
+
 import { findUnfinishedFap } from './utils';
 import { EndNotion } from './end.notion';
 import { Fap } from '../fap.model';
@@ -11,14 +13,19 @@ const debug = createDebug('robot-zougui:fap:end:service');
 export class EndService {
   readonly #notion: EndNotion = new EndNotion();
 
-  finishLastFap = async (options: { content?: string | undefined }): Promise<void> => {
-    const endDate = DateTime.now();
-
+  finishLastFap = async (options: FinishLastFapOptions): Promise<FinishLastFapResult> => {
     const unfinishedFap = await this.getUnfinishedFap();
     await this.finishFap(unfinishedFap, {
       ...options,
-      endDate,
+      endDate: options.date,
     });
+
+    const startTimestamp = unfinishedFap.properties.Date.start.toMillis();
+    const endTimestamp = options.date.toMillis();
+
+    return {
+      duration: ms(endTimestamp - startTimestamp, { format: 'verbose' }),
+    };
   }
 
   //#region
@@ -53,6 +60,15 @@ export class EndService {
     debug('fap finished');
   }
   //#endregion
+}
+
+export interface FinishLastFapOptions {
+  content?: string | undefined;
+  date: DateTime;
+}
+
+export interface FinishLastFapResult {
+  duration: string;
 }
 
 export interface FinishFapOptions {

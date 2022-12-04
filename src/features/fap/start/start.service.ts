@@ -9,12 +9,8 @@ const debug = createDebug('robot-zougui:fap:start:service');
 export class StartService {
   readonly #notion: StartNotion = new StartNotion();
 
-  createFap = async (options: { content?: string | undefined }): Promise<void> => {
-    const date = DateTime.now();
-    const [error] = await _.try(this.#notion.createFap)({
-      ...options,
-      date,
-    });
+  createFap = async (options: CreateFapOptions): Promise<void> => {
+    const [error] = await _.try(this.#notion.createFap)(options);
 
     if (error) {
       throw new Error('An error occured while trying to save the entry', { cause: error });
@@ -22,4 +18,9 @@ export class StartService {
 
     debug('fap created');
   }
+}
+
+export interface CreateFapOptions {
+  date: DateTime;
+  content?: string | undefined;
 }

@@ -5,8 +5,7 @@ import { nanoid } from 'nanoid';
 import { z } from 'zod';
 
 import { executeAction } from './utils';
-import { SelectMenuActionContext } from './types';
-import { ProgramMiddleware } from '../types';
+import { SelectMenuActionContext, SelectMenuMiddleware } from './types';
 import { Reply } from '../../Reply';
 import { Cache } from '../../../utils';
 
@@ -17,7 +16,7 @@ export class SelectMenu<Options extends Record<string, string>> {
   #action: ((context: SelectMenuActionContext<Options>) => void | Promise<void>) | undefined;
   #options: OptionsMap<Options> = {} as OptionsMap<Options>;
   #aliases: Record<string, { option: string; }> = {};
-  #middlewares: ProgramMiddleware[] = [];
+  #middlewares: SelectMenuMiddleware[] = [];
   #cache: Cache<Options> = new Cache();
 
   constructor(name: string) {
@@ -125,7 +124,7 @@ export class SelectMenu<Options extends Record<string, string>> {
     }
   }
 
-  addMiddlewares = (middlewares: ProgramMiddleware[]): this => {
+  addMiddlewares = (middlewares: SelectMenuMiddleware[]): this => {
     this.#middlewares = middlewares;
     return this;
   }

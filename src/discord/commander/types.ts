@@ -5,6 +5,8 @@ import {
   SelectMenuInteraction,
 } from 'discord.js';
 
+import { CommandMiddleware, CommandMiddlewareContext } from './command';
+import { SelectMenuMiddleware, SelectMenuMiddlewareContext } from './select-menu';
 import { Reply } from '../Reply';
 
 export type ArgumentString = `<"${string}...">` | `["${string}..."]` | `<${string}...>` | `[${string}...]` | `<${string}>` | `[${string}]`;
@@ -44,15 +46,9 @@ export type OptionalArraySchema<T extends z.Schema | void, Default extends z.Sch
   MaybeOptional<SchemaOrDefault<T, Default>, z.ZodArray<SchemaOrDefault<T, Default>>>
 );
 
-export type ProgramInteraction = (
-  | AutocompleteInteraction
-  | ChatInputCommandInteraction
-  | SelectMenuInteraction
+export type MiddlewareContext = (
+  | CommandMiddlewareContext
+  | SelectMenuMiddlewareContext
 )
 
-export interface MiddlewareContext {
-  interaction: ProgramInteraction;
-  reply: Reply;
-}
-
-export type ProgramMiddleware = (context: MiddlewareContext) => (void | Promise<void>);
+export type Middleware = CommandMiddleware | SelectMenuMiddleware;

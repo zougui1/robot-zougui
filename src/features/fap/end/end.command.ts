@@ -1,3 +1,5 @@
+import { DateTime } from 'luxon';
+
 import { EndService } from './end.service';
 import { contentOption } from '../options';
 import { Command } from '../../../discord';
@@ -8,8 +10,11 @@ export const subCommandEnd = new Command('end')
   .action(async ({ options, reply }) => {
     const service = new EndService();
 
-    await service.finishLastFap(options);
-    await reply.respondSuccess('The fap entry has been successfully updated');
+    const { duration } = await service.finishLastFap({
+      ...options,
+      date: DateTime.now(),
+    });
+    await reply.respondSuccess(`You finished fapping after ${duration}`);
   });
 
 export type { } from 'zod';

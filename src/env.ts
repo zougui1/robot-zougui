@@ -2,19 +2,27 @@ import path from 'node:path';
 
 import { config } from 'dotenv';
 import env from 'env-var';
+import _ from 'radash';
 
 config({
   path: path.join(__dirname, '../.env'),
 });
 
 const getProdEnv = () => {
+  const publicDiscordChannels = env.get('DISCORD.CHANNEL_IDS.PUBLIC').required().asArray(',');
+  const privateDiscordChannels = env.get('DISCORD.CHANNEL_IDS.PRIVATE').required().asArray(',');
+
   return {
     networkAddress: env.get('NETWORK_ADDRESS').required().asString(),
 
     discord: {
       token: env.get('DISCORD.TOKEN').required().asString(),
       clientId: env.get('DISCORD.CLIENT_ID').required().asString(),
-      channelId: env.get('DISCORD.CHANNEL_ID').required().asString(),
+      channelIds: {
+        public: publicDiscordChannels,
+        private: privateDiscordChannels,
+        all: [...publicDiscordChannels, ...privateDiscordChannels],
+      },
       authorizedUserId: env.get('DISCORD.AUTHORIZED_USER_ID').required().asString(),
 
       icons: {
@@ -62,6 +70,13 @@ const getProdEnv = () => {
     music: {
       dir: env.get('MUSIC.DIR').required().asString(),
       tempDir: env.get('MUSIC.TEMP_DIR').required().asString(),
+    },
+
+    furaffinity: {
+      cookie: {
+        a: env.get('FURAFFINITY.COOKIE.A').required().asString(),
+        b: env.get('FURAFFINITY.COOKIE.B').required().asString(),
+      },
     },
   };
 }

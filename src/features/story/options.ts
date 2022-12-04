@@ -8,6 +8,7 @@ export const createNameOption = ({ reading }: CreateNameOptionOptions): Option<'
   return new Option('<name>')
     .description(`Name of the story you are ${reading ? '' : 'not '}currently reading`)
     .autocomplete(async ({ value }) => {
+      console.log('name autocomplete')
       const service = new StoryService();
       const storyNames = await service.findMatchingStoryNames({ name: value, reading });
 

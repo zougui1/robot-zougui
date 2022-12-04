@@ -9,16 +9,17 @@ export const getItemActionMessage = (options: GetItemActionMessageOptions): stri
 
   const range = tryStringifyRange(numbers);
 
+  const pluralizedLabel = (numbers.length > 1) || range
+    ? itemLabels.plural.toLowerCase()
+    : itemLabels.singular.toLowerCase();
+
   if (range) {
-    return `${actionLabel} the chapters ${range} of "${itemName}"`;
+    return `${actionLabel} the ${pluralizedLabel} ${range} of "${itemName}"`;
   }
 
-  const pluralizedChapter = numbers.length > 1
-    ? itemLabels.plural
-    : itemLabels.singular;
   const chapterNumbersJoined = numbers.join(', ');
 
-  return `${actionLabel} the ${pluralizedChapter} ${chapterNumbersJoined} of "${itemName}"`;
+  return `${actionLabel} the ${pluralizedLabel} ${chapterNumbersJoined} of "${itemName}"`;
 }
 
 export interface GetItemActionMessageOptions {

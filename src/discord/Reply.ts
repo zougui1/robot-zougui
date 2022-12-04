@@ -1,7 +1,7 @@
 import { ChatInputCommandInteraction, SelectMenuInteraction, Message, BaseMessageOptions } from 'discord.js';
 
 import { MessageBuilder } from './Message';
-import { getErrorMessage } from '../utils';
+import { getErrorMessage, Queue } from '../utils';
 
 export class Reply {
   #interaction: ChatInputCommandInteraction | SelectMenuInteraction;
@@ -12,6 +12,7 @@ export class Reply {
   #originalReply: Message | undefined;
   readonly originalMessage: MessageBuilder = new MessageBuilder();
   #originalComponents: BaseMessageOptions['components'];
+  #queue: Queue<Message> = new Queue();
 
   constructor(interaction: ChatInputCommandInteraction | SelectMenuInteraction, options?: ReplyOptions | undefined) {
     this.#interaction = interaction;
@@ -57,10 +58,12 @@ export class Reply {
       throw new Error('The function "updateOriginalReply" must be used on a SelectMenuInteraction');
     }
 
+    const interaction = this.#interaction;
+
     this.#replied = true;
-    this.#originalReply = await this.#interaction.deferUpdate({
+    this.#originalReply = await this.#queue.run(() => interaction.deferUpdate({
       fetchReply: true,
-    });
+    }));
     this.originalMessage.reply.content = this.#originalReply.content;
     this.#originalComponents = this.#originalReply.components;
 
@@ -78,10 +81,10 @@ export class Reply {
 
     const content = this.originalMessage.toString({ debug: this.debug });
 
-    return await this.#interaction.editReply({
+    return await this.#queue.run(() => this.#interaction.editReply({
       content,
       components: this.#originalComponents,
-    });
+    }));
   }
 
   removeComponents(): this {
@@ -106,26 +109,29 @@ export class Reply {
         throw new Error('Cannot reply to a message from a channel that is not present in the cache');
       }
 
-      return await this.#interaction.channel.send({
+      const { channel } = this.#interaction;
+      const originalReply = this.#originalReply;
+
+      return await this.#queue.run(() => channel.send({
         content,
         components: this.#components,
-        reply: { messageReference: this.#originalReply },
-      });
+        reply: { messageReference: originalReply },
+      }));
     }
 
     if (this.#replied) {
-      return await this.#interaction.editReply({
+      return await this.#queue.run(() => this.#interaction.editReply({
         content,
         components: this.#components,
-      });
+      }));
     }
 
     this.#replied = true;
-    return await this.#interaction.reply({
+    return await this.#queue.run(() => this.#interaction.reply({
       content,
       fetchReply: true,
       components: this.#components,
-    });
+    }));
   }
 }
 

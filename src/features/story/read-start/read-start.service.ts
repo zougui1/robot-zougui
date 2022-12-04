@@ -3,6 +3,8 @@ import { DateTime } from 'luxon';
 import { ReadStartNotion } from './read-start.notion';
 import { Story } from '../story.model';
 import { Chapter } from '../chapter.model';
+import { FapContentType } from '../../fap';
+import { StartService } from '../../fap/start/start.service';
 import { getOnePage } from '../../../notion';
 import {
   EphemeralCache,
@@ -19,6 +21,7 @@ export class ReadStartService {
   } as const;
 
   readonly #notion: ReadStartNotion = new ReadStartNotion();
+  readonly #fapStartService: StartService = new StartService();
 
   findChapters = chaptersCache.wrap(async ({ name }: { name: string }): Promise<Chapter.Instance[]> => {
     const story = await this.findUniqueStory({ name });
@@ -43,9 +46,32 @@ export class ReadStartService {
     return story;
   }
 
-  startReadingStory = async ({ name, chapters: chapterNumbers }: StartReadingStoryOptions): Promise<StartReadingStoryResult> => {
-    const date = DateTime.now();
+  startReadingStory = async (options: StartReadingStoryOptions): Promise<StartReadingStoryResult> => {
+    const { name, chapters: chapterNumbers, date, fap } = options;
 
+    await Promise.all([
+      this._startReadingStory(options),
+      fap && this.#fapStartService.createFap({
+        date,
+        content: FapContentType.Story,
+      }),
+    ]);
+
+    return {
+      message: getItemActionMessage({
+        itemName: name,
+        numbers: chapterNumbers,
+        actionLabel: fap ? 'You started fapping on' : 'You started reading',
+        itemLabels: {
+          singular: 'Chapter',
+          plural: 'Chapters',
+        },
+      }),
+    };
+  }
+
+  private async _startReadingStory(options: StartReadingStoryOptions): Promise<void> {
+    const { name, chapters: chapterNumbers, date } = options;
     const allChapters = await this.findChapters({ name });
 
     const chapters = filterPagesByNumbers(
@@ -56,24 +82,14 @@ export class ReadStartService {
     const chapterIds = chapters.map(chapter => chapter.id);
 
     await this.#notion.startReadingStory({ name, chapterIds, date });
-
-    return {
-      message: getItemActionMessage({
-        itemName: name,
-        numbers: chapterNumbers,
-        actionLabel: 'You started reading',
-        itemLabels: {
-          singular: 'Chapter',
-          plural: 'Chapters',
-        },
-      }),
-    };
   }
 }
 
 export interface StartReadingStoryOptions {
   name: string;
   chapters: number[];
+  date: DateTime;
+  fap?: boolean | undefined;
 }
 
 export interface StartReadingStoryResult {

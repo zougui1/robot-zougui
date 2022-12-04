@@ -7,7 +7,7 @@ import { fapCommand } from './features/fap';
 import { showCommand } from './features/show';
 import { storyCommand } from './features/story';
 import { musicCommand, musicNamingSelectMenu } from './features/music';
-import { createAuthorizer } from './middlewares';
+import { createAuthorizer, createChannelWhitelist } from './middlewares';
 import { Network, NetworkStatus } from './utils';
 import env from './env';
 
@@ -25,6 +25,7 @@ const createProgram = async (): Promise<Program> => {
   const program = new Program(client, env.discord);
 
   program.use(createAuthorizer({ authorizedUserIds: [env.discord.authorizedUserId] }));
+  program.use(createChannelWhitelist({ channelIds: env.discord.channelIds.all }));
 
   program.addCommand(fapCommand);
   program.addCommand(showCommand);
@@ -36,15 +37,14 @@ const createProgram = async (): Promise<Program> => {
   await program.parse();
 
   const guildList = await client.guilds.fetch();
-
-  const channelIds = [env.discord.channelId];
+  const { channelIds } = env.discord;
 
   for (const guildItem of guildList.values()) {
     const guild = await guildItem.fetch();
     const channelList = await guild.channels.fetch();
 
     for (const channelItem of channelList.values()) {
-      if (channelItem && channelIds.includes(channelItem.id)) {
+      if (channelItem && channelIds.all.includes(channelItem.id)) {
         await channelItem?.fetch();
       }
     }

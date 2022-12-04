@@ -2,8 +2,7 @@ import { z } from 'zod';
 import { ChatInputCommandInteraction } from 'discord.js';
 import type { CamelCase } from 'type-fest';
 
-import type { Option } from '../option';
-import { FindOptionSchema, OptionString } from '../types';
+import { OptionString } from '../types';
 import { Reply } from '../../Reply';
 
 export type ParseOptionName<T extends string> =
@@ -18,10 +17,6 @@ export type ParseOption<T extends string, TParser extends z.ZodSchema | undefine
 
 export type ParseArg<TParser> = TParser extends z.ZodSchema ? z.infer<TParser> : string;
 
-export type InternalOptions<Options extends z.ZodRawShape = z.ZodRawShape> = {
-  [P in keyof Options['shape']]: Option<any, any, any>;
-}
-
 export interface OptionOptions<
   ArgName extends OptionString,
   Schema extends z.Schema = z.ZodString,
@@ -35,3 +30,10 @@ export interface ActionContext<Options extends Record<string, unknown>> {
   options: Options;
   reply: Reply;
 }
+
+export interface CommandMiddlewareContext {
+  interaction: ChatInputCommandInteraction;
+  reply: Reply;
+}
+
+export type CommandMiddleware = (context: CommandMiddlewareContext) => (void | Promise<void>);

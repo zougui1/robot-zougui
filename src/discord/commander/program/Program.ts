@@ -4,9 +4,9 @@ import createDebug from 'debug';
 
 import { ClientState } from './ClientState';
 import { createInteractionHandler, logCreatedCommands } from './utils';
-import { Command, CommandMap } from '../command';
-import { SelectMenu, SelectMenuMap } from '../select-menu';
-import { ProgramMiddleware } from '../types';
+import { Command, CommandMap, CommandMiddleware } from '../command';
+import { SelectMenu, SelectMenuMap, SelectMenuMiddleware } from '../select-menu';
+import { Middleware } from '../types';
 import { initializeCommands, } from '../../utils';
 import { onceProgramExit } from '../../../utils';
 
@@ -20,7 +20,7 @@ export class Program {
   readonly #token: string;
   readonly #clientId: string;
   readonly #state: ClientState;
-  readonly #middlewares: ProgramMiddleware[] = [];
+  readonly #middlewares: Middleware[] = [];
 
   constructor(client: Client, options: ProgramOptions) {
     this.#client = client;
@@ -34,17 +34,25 @@ export class Program {
 
   addCommand(command: Command<any>): this {
     // gotta copy the array as its referenced value is modified by `this.use`
-    command.addMiddlewares([...this.#middlewares]);
+    // it is safe to assume those middlewares are of type CommandMiddleware
+    // as the only different is in the type of interaction and its type is
+    // handled in the middlewares themselves
+    command.addMiddlewares([...this.#middlewares] as CommandMiddleware[]);
     this.commands.add(command);
     return this;
   }
 
   addSelectMenu(selectMenu: SelectMenu<any>): this {
     this.selectMenus.add(selectMenu);
+    // gotta copy the array as its referenced value is modified by `this.use`
+    // it is safe to assume those middlewares are of type SelectMenuMiddleware
+    // as the only different is in the type of interaction and its type is
+    // handled in the middlewares themselves
+    selectMenu.addMiddlewares([...this.#middlewares] as SelectMenuMiddleware[]);
     return this;
   }
 
-  use(...middlewares: ProgramMiddleware[]): this {
+  use(...middlewares: Middleware[]): this {
     this.#middlewares.push(...middlewares);
     return this;
   }

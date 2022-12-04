@@ -11,3 +11,4 @@ export * from './safeSplit';
 export * from './Cache';
 export * from './Network';
 export * from './process-progress';
+export * from './Queue';

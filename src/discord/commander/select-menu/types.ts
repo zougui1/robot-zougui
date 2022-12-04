@@ -7,3 +7,10 @@ export interface SelectMenuActionContext<Options extends Record<string, string>>
   options: Options;
   reply: Reply;
 }
+
+export interface SelectMenuMiddlewareContext {
+  interaction: SelectMenuInteraction;
+  reply: Reply;
+}
+
+export type SelectMenuMiddleware = (context: SelectMenuMiddlewareContext) => (void | Promise<void>);

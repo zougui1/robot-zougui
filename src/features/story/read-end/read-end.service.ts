@@ -2,6 +2,8 @@ import { DateTime } from 'luxon';
 
 import { ReadEndNotion } from './read-end.notion';
 import { ReadTrace } from '../read-trace.model';
+import { EndService } from '../../fap/end/end.service';
+import { FapContentType } from '../../fap';
 import { getOnePage } from '../../../notion';
 import { getItemActionMessage } from '../../../utils';
 
@@ -12,6 +14,7 @@ export class ReadEndService {
   } as const;
 
   readonly #notion: ReadEndNotion = new ReadEndNotion();
+  readonly #fapEndService: EndService = new EndService();
 
   findUniqueStory = async ({ name }: { name: string }): Promise<ReadTrace.Instance> => {
     const story = getOnePage(
@@ -31,9 +34,29 @@ export class ReadEndService {
     return story;
   }
 
-  stopReadingStory = async ({ name }: StartReadingStoryOptions): Promise<StartReadingStoryResult> => {
-    const date = DateTime.now();
+  stopReadingStory = async ({ name, date, fap }: StopReadingStoryOptions): Promise<StartReadingStoryResult> => {
+    const [{ chapterNumbers }] = await Promise.all([
+      this._stopReadingStory({ name, date }),
+      fap && this.#fapEndService.finishLastFap({
+        date,
+        content: FapContentType.Story,
+      }),
+    ])
 
+    return {
+      message: getItemActionMessage({
+        itemName: name,
+        numbers: chapterNumbers,
+        actionLabel: fap ? 'You finished fapping on' : 'You finished reading',
+        itemLabels: {
+          singular: 'Chapter',
+          plural: 'Chapters',
+        },
+      }),
+    };
+  }
+
+  private async _stopReadingStory({ name, date }: Omit<StopReadingStoryOptions, 'fap'>): Promise<{ chapterNumbers: number[] }> {
     const story = await this.findUniqueStory({ name });
     await this.#notion.stopReadingStory({
       storyId: story.id,
@@ -44,22 +67,14 @@ export class ReadEndService {
     const chapters = await this.#notion.findChaptersById({ ids: chapterIds });
     const chapterNumbers = chapters.map(chapter => chapter.properties.Index.number);
 
-    return {
-      message: getItemActionMessage({
-        itemName: name,
-        numbers: chapterNumbers,
-        actionLabel: 'You finished reading',
-        itemLabels: {
-          singular: 'Chapter',
-          plural: 'Chapters',
-        },
-      }),
-    };
+    return { chapterNumbers };
   }
 }
 
-export interface StartReadingStoryOptions {
+export interface StopReadingStoryOptions {
+  date: DateTime;
   name: string;
+  fap?: boolean | undefined;
 }
 
 export interface StartReadingStoryResult {
