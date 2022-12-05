@@ -27,7 +27,7 @@ import env from './env';
   }
 
   console.log(submission.publishedAt.toISO());
-  const { destFile } = await submission.downloadToDir(destDir);
+  const { destFile } = await submission.file.downloadToDir(destDir);
 
   console.log('downloaded');
   console.time('getText')

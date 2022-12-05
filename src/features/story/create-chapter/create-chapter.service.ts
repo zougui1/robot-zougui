@@ -18,7 +18,7 @@ const reWWW = /^https?:\/\/www./;
 export class CreateChapterService extends StoryService {
   readonly #notion: CreateChapterNotion = new CreateChapterNotion();
 
-  createChapter = async (options: CreateChapterOptions): Promise<void> => {
+  createChapter = async (options: CreateChapterOptions): Promise<CreateChapterResult> => {
     const cleanUrl = removeTrailingSlash(removeQueryString(options.url));
 
     const similarChapters = await this.#notion.findChaptersBySimilarUrl(
@@ -27,7 +27,8 @@ export class CreateChapterService extends StoryService {
     const existingChapter = findChapterByUrl(similarChapters, cleanUrl);
 
     if (existingChapter) {
-      throw new Error(`The URL "${options.url}" has already been downloaded under the name "${existingChapter.properties.Name.text}"`);
+      console.warn('Chapter dedup deactivated!')
+      //throw new Error(`The URL "${options.url}" has already been downloaded under the name "${existingChapter.properties.Name.text}"`);
     }
 
     const submission = await downloadSubmission(options.url, env.tempDir, {
@@ -36,7 +37,7 @@ export class CreateChapterService extends StoryService {
 
     try {
       const [fileError, fileUrl] = submission.filePath
-        ? await _.try(options.getFileUrl)(await fs.readFile(submission.filePath), submission.data.fileName)
+        ? await _.try(options.getFileUrl)(await fs.readFile(submission.filePath), submission.data.file.getSpoileredName())
         : [];
 
       if (fileError) {
@@ -80,6 +81,14 @@ export class CreateChapterService extends StoryService {
         } : undefined,
         words: submission.wordCount,
       });
+
+      const maybeChapterName = options.chapterName
+        ? `: "${options.chapterName}"`
+        : '';
+
+      return {
+        message: `Created the chapter #${index}${maybeChapterName} of the story "${options.storyName}"`,
+      };
     } finally {
       if (submission.filePath) {
         try {
@@ -114,4 +123,8 @@ export interface CreateChapterOptions {
   index?: number | undefined;
   onProgress: (progress: string) => void;
   getFileUrl: (file: Buffer, name: string) => Promise<string | undefined>;
+}
+
+export interface CreateChapterResult {
+  message: string;
 }

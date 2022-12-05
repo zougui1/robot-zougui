@@ -25,7 +25,7 @@ export const subCommandCreateChapter = new Command('create-chapter')
 
     let tempMessage: Message | undefined;
 
-    await service.createChapter({
+    const result = await service.createChapter({
       ...options,
       onProgress: async progress => {
         await reply.sendContent(progress);
@@ -48,7 +48,7 @@ export const subCommandCreateChapter = new Command('create-chapter')
       });
     }
 
-    await reply.respondSuccess('Chapter created');
+    await reply.respondSuccess(result.message);
   });
 
 export type { } from 'zod';

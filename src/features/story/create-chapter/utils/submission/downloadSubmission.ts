@@ -22,7 +22,7 @@ export const downloadSubmission = async (url: string, tempDir: string, options: 
     state.finishDownloadingWebpage();
   }
 
-  const [fileError, file] = await _.try(submission.downloadToDir)(tempDir);
+  const [fileError, file] = await _.try(submission.file.downloadToDir)(tempDir);
 
   if (fileError) {
     debug(chalk.red('[ERROR]'), fileError);
@@ -30,7 +30,13 @@ export const downloadSubmission = async (url: string, tempDir: string, options: 
     state.finishDownloadingFile();
   }
 
-  const wordCount = file?.destFile ? await countFileWords(file.destFile, state) : undefined;
+  const isFileStory = submission.file.isStory();
+
+  if (!isFileStory) {
+    state.error();
+  }
+
+  const wordCount = (file?.destFile && isFileStory) ? await countFileWords(file.destFile, state) : undefined;
 
   return {
     data: submission,

@@ -1,18 +1,15 @@
-import path from 'node:path';
-
 import { Rating, Category, Species, Gender, ISubmission } from 'furaffinity-api';
 import { DateTime } from 'luxon';
 
 import { findSubmission } from './queries';
-import { downloadSubmissionFile } from './utils';
 import { Author } from '../author';
+import { SubmissionFile } from '../submission-file';
 
 export class Submission {
   id: string;
   url: string;
-  downloadUrl: string;
+  file: SubmissionFile;
   title: string;
-  fileName: string;
   publishedAt: DateTime;
   rating: Rating;
   keywords: string[];
@@ -36,9 +33,8 @@ export class Submission {
   constructor(submission: ISubmission) {
     this.id = submission.id;
     this.url = submission.url;
-    this.downloadUrl = submission.downloadUrl;
+    this.file = new SubmissionFile(submission.downloadUrl, submission.content.category);
     this.title = submission.title;
-    this.fileName = path.basename(submission.downloadUrl);
     this.publishedAt = DateTime.fromMillis(submission.posted);
     this.rating = submission.rating;
     this.keywords = submission.keywords;
@@ -50,15 +46,13 @@ export class Submission {
     this.gender = submission.content.gender;
   }
 
-  downloadToDir = async (dirPath: string): Promise<{ destFile: string }> => {
-    const destFile = path.join(dirPath, this.fileName);
-    await downloadSubmissionFile(this.downloadUrl, destFile, this.category);
-    return { destFile };
-  }
-
   //#region category checks
   isStory = (): boolean => {
     return this.category === Category.Story;
   }
   //#endregion
+}
+
+export interface DownloadToDirOptions {
+  spoiler?: boolean | undefined;
 }
