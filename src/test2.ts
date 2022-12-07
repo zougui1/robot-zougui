@@ -1,40 +1,78 @@
-import path from 'node:path';
-import URL from 'node:url';
-
-import fs from 'fs-extra';
-import { getText } from 'any-text';
-import _ from 'radash';
-
-import { Furaffinity, Submission } from './furaffinity';
-import { splitWords } from './utils';
-import env from './env';
+import { ProcessState, ProcessProgress } from './utils';
 
 (async () => {
-  const submissionId = '49013926';
-  const submissionUrl = 'https://www.furaffinity.net/view/20278684/';
-  const destDir = '/mnt/Manjaro_Data/zougui/workspace/temp/';
-  const wordFile = path.join(destDir, 'words.json');
+  console.group('State');
+  const state = new ProcessState()
+    .addStep('downloadingWebpage', {
+      title: 'Downloading webpage',
+      success: { content: 'Downloaded' },
+      running: { content: 'Downloading...' },
+    })
+    .addStep('downloadingFile', {
+      title: 'Downloading file',
+      success: { content: 'Downloaded' },
+      running: { content: 'Downloading...' },
+    })
+    .addStep('parsingFile', {
+      title: 'Parsing file',
+      success: { content: 'Parsed' },
+      running: { content: 'Parsing...' },
+    })
+    .addStep('countingWords', {
+      title: 'Counting words',
+      success: { content: 'Counted' },
+      running: { content: 'Counting...' },
+    });
 
-  console.log(URL.parse(submissionUrl));
+  console.log(state.getProgressString());
 
-  // cookies no longer work for some reasons. renew them
-  Furaffinity.login(env.furaffinity.cookie.a, env.furaffinity.cookie.b);
-  const submission = await Submission.find(submissionUrl);
+  state.finish('downloadingFile')
+  console.log();
+  console.log(state.getProgressString());
 
-  if (!submission) {
-    console.log('submission not found');
-    return;
-  }
+  state.error('parsingFile', 'The file is not a text or a document');
+  console.log();
+  console.log(state.getProgressString());
 
-  console.log(submission.publishedAt.toISO());
-  const { destFile } = await submission.file.downloadToDir(destDir);
+  console.groupEnd();
+})();
 
-  console.log('downloaded');
-  console.time('getText')
-  const text = await getText(destFile);
-  const words = splitWords(text);
-  console.timeEnd('getText')
-  console.log('words:', words.length)
-  await fs.writeJson(wordFile, words, { spaces: 2 });
-  await fs.writeFile(path.join(destDir, 'text.txt'), text);
+(async () => {
+  console.group('Progress');
+  const progress = new ProcessProgress()
+    .addStep({
+      title: 'Downloading webpage',
+      success: { content: 'Downloaded' },
+      running: { content: 'Downloading...' },
+      error: { content: 'An error occured' },
+      done: false,
+      errored: false,
+    })
+    .addStep({
+      title: 'Downloading file',
+      success: { content: 'Downloaded' },
+      running: { content: 'Downloading...' },
+      error: { content: 'An error occured' },
+      done: false,
+      errored: false,
+    })
+    .addStep({
+      title: 'Parsing file',
+      success: { content: 'Parsed' },
+      running: { content: 'Parsing...' },
+      error: { content: 'An error occured' },
+      done: false,
+      errored: false,
+    })
+    .addStep({
+      title: 'Counting words',
+      success: { content: 'Counted' },
+      running: { content: 'Counting...' },
+      error: { content: 'An error occured' },
+      done: false,
+      errored: false,
+    });
+
+  console.log(progress.toString());
+  console.groupEnd();
 })();

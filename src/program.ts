@@ -9,7 +9,7 @@ import { showCommand } from './features/show';
 import { storyCommand } from './features/story';
 import { musicCommand, musicNamingSelectMenu } from './features/music';
 import { createAuthorizer, createChannelWhitelist } from './middlewares';
-import { Network, NetworkStatus } from './utils';
+import { Network, NetworkStatus, ProcessProgress } from './utils';
 import env from './env';
 
 const debug = createDebug('robot-zougui:program');
@@ -34,6 +34,10 @@ const createProgram = async (): Promise<Program> => {
   program.addCommand(musicCommand);
 
   program.addSelectMenu(musicNamingSelectMenu);
+
+  ProcessProgress.defaultIcons.running = env.discord.icons.running;
+  ProcessProgress.defaultIcons.error = env.discord.icons.error;
+  ProcessProgress.defaultIcons.success = env.discord.icons.success;
 
   await program.parse();
   Furaffinity.login(env.furaffinity.cookie.a, env.furaffinity.cookie.b);

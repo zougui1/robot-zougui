@@ -4,55 +4,59 @@ import _ from 'radash'
 
 import { findStorySubmission } from './findStorySubmission';
 import { countFileWords } from './countFileWords';
-import { DownloadSubmissionState } from './DownloadSubmissionState';
+import { createDownloadState } from './createDownloadState';
 import { Submission } from '../../../../../furaffinity';
 
 const debug = createDebug('robot-zougui:story:create-chapter:submission:download');
 
 export const downloadSubmission = async (url: string, tempDir: string, options: DownloadSubmissionOptions): Promise<DownloadSubmissionResult> => {
-  const state = new DownloadSubmissionState();
+  const state = createDownloadState();
   state.on('progress', options.onProgress);
 
   const [submissionError, submission] = await _.try(findStorySubmission)(url);
 
   if (submissionError) {
-    state.error();
+    state.error('downloadingWebpage');
     throw submissionError;
   } else {
-    state.finishDownloadingWebpage();
+    state.finish('downloadingWebpage');
   }
 
   const [fileError, file] = await _.try(submission.file.downloadToDir)(tempDir);
 
   if (fileError) {
     debug(chalk.red('[ERROR]'), fileError);
+    state.error('downloadingFile');
   } else {
-    state.finishDownloadingFile();
+    state.finish('downloadingFile');
   }
 
   const isFileStory = submission.file.isStory();
 
   if (!isFileStory) {
-    state.error();
+    state.error('parsingFile', 'The submission file is not a text or a document');
   }
 
-  const wordCount = (file?.destFile && isFileStory) ? await countFileWords(file.destFile, state) : undefined;
+  const wordCount = (file?.destFile && isFileStory)
+    ? await countFileWords(file.destFile, state)
+    : undefined;
+
+  // give time for the state to emit the events before removing the listener
+  process.nextTick(() => state.off('progress', options.onProgress));
 
   return {
     data: submission,
     filePath: file?.destFile,
     wordCount,
-    state,
   };
 }
 
 export interface DownloadSubmissionOptions {
-  onProgress: (state: DownloadSubmissionState) => void;
+  onProgress: (state: { progressString: string }) => void;
 }
 
 export interface DownloadSubmissionResult {
   data: Submission;
-  state: DownloadSubmissionState;
   filePath?: string | undefined;
   wordCount?: number | undefined;
 }

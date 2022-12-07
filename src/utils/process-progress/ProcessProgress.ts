@@ -1,14 +1,29 @@
-import { ProcessStep, ProcessStepOptions } from './ProcessStep';
+import { ProcessStep, StepMessage } from './ProcessStep';
 
 export class ProcessProgress {
+  static defaultIcons: Partial<Record<Status, string>> = {};
+
   readonly #steps: ProcessStep[] = [];
 
-  addStep(options: ProcessStep | ProcessStepOptions): this {
-    const step = options instanceof ProcessStep
-      ? options
-      : new ProcessStep(options);
+  addStep(options: AddStepOptions): this {
+    const step = new ProcessStep({
+      ...options,
+      running: {
+        ...options.running,
+        icon: options.running.icon ?? ProcessProgress.defaultIcons.running,
+      },
+      error: {
+        ...options.error,
+        icon: options.error.icon ?? ProcessProgress.defaultIcons.error,
+      },
+      success: {
+        ...options.success,
+        icon: options.success.icon ?? ProcessProgress.defaultIcons.success,
+      },
+    });
 
     this.#steps.push(step);
+
     return this;
   }
 
@@ -19,7 +34,7 @@ export class ProcessProgress {
 
   private getRelevantSteps(): ProcessStep[] {
     return this.#steps.filter((step, index) => {
-      const previousStep = this.#steps.at(index - 1);
+      const previousStep = this.#steps[index - 1];
 
       if (!previousStep) {
         return true;
@@ -28,4 +43,15 @@ export class ProcessProgress {
       return step.done || previousStep.done;
     })
   }
+}
+
+export type Status = 'running' | 'error' | 'success';
+
+export interface AddStepOptions {
+  title: string;
+  success: StepMessage;
+  running: StepMessage;
+  error: StepMessage;
+  done: boolean;
+  errored: boolean;
 }

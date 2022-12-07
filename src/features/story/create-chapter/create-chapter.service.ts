@@ -6,7 +6,7 @@ import createDebug from 'debug';
 import chalk from 'chalk';
 
 import { CreateChapterNotion } from './create-chapter.notion';
-import { findChapterByUrl, downloadSubmission, getProgressMessage } from './utils';
+import { findChapterByUrl, downloadSubmission } from './utils';
 import { StoryService } from '../story.service';
 import { Chapter } from '../chapter.model';
 import { removeTrailingSlash, removeQueryString } from '../../../utils';
@@ -27,12 +27,11 @@ export class CreateChapterService extends StoryService {
     const existingChapter = findChapterByUrl(similarChapters, cleanUrl);
 
     if (existingChapter) {
-      console.warn('Chapter dedup deactivated!')
-      //throw new Error(`The URL "${options.url}" has already been downloaded under the name "${existingChapter.properties.Name.text}"`);
+      throw new Error(`The URL "${options.url}" has already been downloaded under the name "${existingChapter.properties.Name.text}"`);
     }
 
     const submission = await downloadSubmission(options.url, env.tempDir, {
-      onProgress: state => options.onProgress(getProgressMessage(state)),
+      onProgress: state => options.onProgress(state.progressString),
     });
 
     try {

@@ -17,19 +17,38 @@ export class ProcessStep {
 
   toString(): string {
     const message = this.getMessage();
-    return `${this.title} ${message}`;
+    return `${this.title}: ${message}`;
   }
 
   private getMessage(): string {
+    const icon = this.getIcon();
+    const content = this.getContent();
+
+    return icon ? `${icon} ${content}` : content;
+  }
+
+  private getContent(): string {
     if (this.done) {
-      return `${this.success.icon} ${this.success.content}`;
+      return this.success.content;
     }
 
     if (this.errored) {
-      return `${this.error.icon} ${this.error.content}`;
+      return this.error.content;
     }
 
-    return `${this.running.icon} ${this.running.content}`;
+    return this.running.content;
+  }
+
+  private getIcon(): string | undefined {
+    if (this.done) {
+      return this.success.icon;
+    }
+
+    if (this.errored) {
+      return this.error.icon;
+    }
+
+    return this.running.icon;
   }
 }
 
@@ -43,6 +62,6 @@ export interface ProcessStepOptions {
 }
 
 export interface StepMessage {
-  icon: string;
+  icon?: string | undefined;
   content: string;
 }
