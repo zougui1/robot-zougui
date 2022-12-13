@@ -25,6 +25,7 @@ export class EndService {
 
     return {
       duration: ms(endTimestamp - startTimestamp, { format: 'verbose' }),
+      content: options.content || unfinishedFap.properties.Content.select.name,
     };
   }
 
@@ -69,6 +70,7 @@ export interface FinishLastFapOptions {
 
 export interface FinishLastFapResult {
   duration: string;
+  content: string | undefined;
 }
 
 export interface FinishFapOptions {

@@ -1,12 +1,13 @@
 import { DateTime } from 'luxon';
 
 import { StartService } from './start.service';
-import { contentOption } from '../options';
+import { FapContentType } from '../FapContentType';
+import { createContentOption } from '../options';
 import { Command } from '../../../discord';
 
 export const subCommandStart = new Command('start')
   .description('start fapping')
-  .addOption(contentOption)
+  .addOption(createContentOption({ defaultValue: FapContentType.Art }))
   .action(async ({ options, reply }) => {
     const service = new StartService();
 
@@ -14,7 +15,7 @@ export const subCommandStart = new Command('start')
       ...options,
       date: DateTime.now(),
     });
-    await reply.respondSuccess('You started fapping');
+    await reply.respondSuccess(`You started fapping on ${options.content}`);
   });
 
 export type { } from 'zod';

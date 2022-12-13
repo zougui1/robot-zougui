@@ -3,6 +3,7 @@ import { createModel, Property } from '../../notion';
 export const Fap = createModel({
   properties: {
     Date: Property.Date,
+    Content: Property.Select,
   },
 });
 
