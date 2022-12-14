@@ -19,6 +19,12 @@ export const subCommandCreateChapter = new Command('create-chapter')
   .option('[index]', 'Index of the chapter, default = lastFoundIndex + 1', {
     schema: z.number().positive(),
   })
+  .option('[start-read]', 'Start reading the newly created chapter', {
+    schema: z.boolean(),
+  })
+  .option('[start-fap]', 'Start fapping on the newly created chapter', {
+    schema: z.boolean(),
+  })
   .action(async ({ options, reply, interaction }) => {
     reply.defer();
     const service = new CreateChapterService();

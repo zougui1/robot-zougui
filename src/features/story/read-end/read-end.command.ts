@@ -8,7 +8,7 @@ import { Command } from '../../../discord';
 export const subCommandReadEnd = new Command('read-end')
   .description('stop reading a story')
   .addOption(createNameOption({ reading: true }))
-  .option('[fap]', 'Finish fapping on this story', {
+  .option('[fap-end]', 'Finish fapping on this story', {
     schema: z.boolean(),
   })
   .action(async ({ options, reply }) => {

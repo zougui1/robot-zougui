@@ -12,11 +12,11 @@ export class ReadStartService extends StoryService {
   readonly #fapStartService: StartService = new StartService();
 
   startReadingStory = async (options: StartReadingStoryOptions): Promise<StartReadingStoryResult> => {
-    const { name, chapters: chapterNumbers, date, fap } = options;
+    const { name, chapters: chapterNumbers, date, fapStart } = options;
 
     await Promise.all([
       this._startReadingStory(options),
-      fap && this.#fapStartService.createFap({
+      fapStart && this.#fapStartService.createFap({
         date,
         content: FapContentType.Story,
       }),
@@ -26,7 +26,7 @@ export class ReadStartService extends StoryService {
       message: getItemActionMessage({
         itemName: name,
         numbers: chapterNumbers,
-        actionLabel: fap ? 'You started fapping on' : 'You started reading',
+        actionLabel: fapStart ? 'You started fapping on' : 'You started reading',
         itemLabels: {
           singular: 'Chapter',
           plural: 'Chapters',
@@ -67,7 +67,7 @@ export interface StartReadingStoryOptions {
   name: string;
   chapters: number[];
   date: DateTime;
-  fap?: boolean | undefined;
+  fapStart?: boolean | undefined;
 }
 
 export interface StartReadingStoryResult {

@@ -34,10 +34,10 @@ export class ReadEndService {
     return story;
   }
 
-  stopReadingStory = async ({ name, date, fap }: StopReadingStoryOptions): Promise<StartReadingStoryResult> => {
+  stopReadingStory = async ({ name, date, fapEnd }: StopReadingStoryOptions): Promise<StartReadingStoryResult> => {
     const [{ chapterNumbers }] = await Promise.all([
       this._stopReadingStory({ name, date }),
-      fap && this.#fapEndService.finishLastFap({
+      fapEnd && this.#fapEndService.finishLastFap({
         date,
         content: FapContentType.Story,
       }),
@@ -47,7 +47,7 @@ export class ReadEndService {
       message: getItemActionMessage({
         itemName: name,
         numbers: chapterNumbers,
-        actionLabel: fap ? 'You finished fapping on' : 'You finished reading',
+        actionLabel: fapEnd ? 'You finished fapping on' : 'You finished reading',
         itemLabels: {
           singular: 'Chapter',
           plural: 'Chapters',
@@ -74,7 +74,7 @@ export class ReadEndService {
 export interface StopReadingStoryOptions {
   date: DateTime;
   name: string;
-  fap?: boolean | undefined;
+  fapEnd?: boolean | undefined;
 }
 
 export interface StartReadingStoryResult {

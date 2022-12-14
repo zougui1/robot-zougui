@@ -10,7 +10,7 @@ export const subCommandReadStart = new Command('read-start')
   .description('Start reading a story')
   .addOption(createNameOption({ reading: false }))
   .addOption(chaptersOption)
-  .option('[fap]', 'Start fapping on this story', {
+  .option('[fap-start]', 'Start fapping on this story', {
     schema: z.boolean(),
   })
   .action(async ({ options, reply }) => {
