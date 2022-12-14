@@ -24,31 +24,44 @@ export class CreateChapterService extends StoryService {
   readonly #fapStart: FapStartService = new FapStartService();
   readonly #readStart: ReadStartService = new ReadStartService();
 
-  createChapter = async (options: CreateChapterOptions): Promise<CreateChapterResult> => {
+  createChapterFromSubmission = async (options: CreateChapterFromSubmissionOptions): Promise<CreateChapterResult> => {
     const cleanUrl = removeTrailingSlash(removeQueryString(options.url));
 
-    const similarChapters = await this.#notion.findChaptersBySimilarUrl(
-      cleanUrl.replace(reWWW, ''),
-    );
-    const existingChapter = findChapterByUrl(similarChapters, cleanUrl);
-
-    if (existingChapter) {
-      //throw new Error(`The URL "${options.url}" has already been downloaded under the name "${existingChapter.properties.Name.text}"`);
-    }
+    await this.checkChapterUrl(cleanUrl);
 
     const submission = await downloadSubmission(options.url, env.tempDir, {
       onProgress: state => options.onProgress(state.progressString),
     });
 
+    const [fileError, fileUrl] = submission.filePath
+      ? await _.try(options.getFileUrl)(await fs.readFile(submission.filePath), submission.data.file.getSpoileredName())
+      : [];
+
+    if (fileError) {
+      debug(chalk.red('[ERROR]'), fileError);
+    }
+
+    return await this.createChapter({
+      ...options,
+      filePath: submission.filePath,
+      wordCount: submission.wordCount,
+      fileUrl: fileUrl ?? undefined,
+    });
+  }
+
+  checkChapterUrl = async (url: string): Promise<void> => {
+    const similarChapters = await this.#notion.findChaptersBySimilarUrl(
+      url.replace(reWWW, ''),
+    );
+    const existingChapter = findChapterByUrl(similarChapters, url);
+
+    if (existingChapter) {
+      throw new Error(`The URL "${url}" has already been downloaded under the name "${existingChapter.properties.Name.text}"`);
+    }
+  }
+
+  createChapter = async (options: CreateChapterOptions): Promise<CreateChapterResult> => {
     try {
-      const [fileError, fileUrl] = submission.filePath
-        ? await _.try(options.getFileUrl)(await fs.readFile(submission.filePath), submission.data.file.getSpoileredName())
-        : [];
-
-      if (fileError) {
-        debug(chalk.red('[ERROR]'), fileError);
-      }
-
       const story = await this.findOrCreateStory(options.storyName);
       const chapters = await this.findChapters({
         name: options.storyName,
@@ -79,12 +92,12 @@ export class CreateChapterService extends StoryService {
         name,
         index,
         storyId: story.id,
-        url: cleanUrl,
-        file: submission.filePath && fileUrl ? {
-          url: fileUrl,
-          name: `${name}${path.extname(submission.filePath)}`,
+        url: options.url,
+        file: options.filePath && options.fileUrl ? {
+          url: options.fileUrl,
+          name: `${name}${path.extname(options.filePath)}`,
         } : undefined,
-        words: submission.wordCount,
+        words: options.wordCount,
       });
 
       const maybeChapterName = options.chapterName
@@ -104,9 +117,9 @@ export class CreateChapterService extends StoryService {
         message: `${creationMessage}\n${readMessage || ''}\n${fapMessage || ''}`.trim(),
       };
     } finally {
-      if (submission.filePath) {
+      if (options.filePath) {
         try {
-          await fs.remove(submission.filePath);
+          await fs.remove(options.filePath);
         } catch (error) {
           debug(chalk.red('[ERROR]'), error);
         }
@@ -177,7 +190,7 @@ export class CreateChapterService extends StoryService {
   }
 }
 
-export interface CreateChapterOptions {
+export interface CreateChapterFromSubmissionOptions {
   storyName: string;
   url: string;
   chapterName?: string | undefined;
@@ -186,6 +199,18 @@ export interface CreateChapterOptions {
   startFap?: boolean | undefined;
   onProgress: (progress: string) => void;
   getFileUrl: (file: Buffer, name: string) => Promise<string | undefined>;
+}
+
+export interface CreateChapterOptions {
+  storyName: string;
+  url?: string | undefined;
+  fileUrl?: string | undefined;
+  filePath?: string | undefined;
+  wordCount?: number | undefined;
+  chapterName?: string | undefined;
+  index?: number | undefined;
+  startRead?: boolean | undefined;
+  startFap?: boolean | undefined;
 }
 
 export interface CreateChapterResult {

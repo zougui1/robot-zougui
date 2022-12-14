@@ -49,7 +49,7 @@ export class CreateChapterNotion extends StoryNotion {
         Index: {
           number: index,
         },
-        URL: { url },
+        URL: { url: url ?? null },
         Story: {
           relation: [{ id: storyId }],
         },
@@ -96,7 +96,7 @@ export class CreateChapterNotion extends StoryNotion {
 export interface CreateChapterOptions {
   name: string;
   index: number;
-  url: string;
+  url?: string | undefined;
   storyId: string;
   words?: number | undefined;
   file?: {

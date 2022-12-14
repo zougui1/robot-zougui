@@ -31,7 +31,7 @@ export const subCommandCreateChapter = new Command('create-chapter')
 
     let tempMessage: Message | undefined;
 
-    const result = await service.createChapter({
+    const result = await service.createChapterFromSubmission({
       ...options,
       onProgress: async progress => {
         await reply.sendContent(progress);
