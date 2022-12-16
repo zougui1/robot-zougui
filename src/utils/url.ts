@@ -1,6 +1,8 @@
 import URL from 'node:url';
 
-import { joinUrl } from '@zougui/common.url-utils';
+import QS from 'qs';
+
+import { joinUrl, isRelativeUrl } from '@zougui/common.url-utils';
 import { removeSuffix } from '@zougui/common.string-utils';
 
 export const isPathNameValid = (url: string, pathNameScheme: string): boolean => {
@@ -27,6 +29,40 @@ export const isPathNameValid = (url: string, pathNameScheme: string): boolean =>
 
     return pathNameScheme === urlPathName;
   });
+}
+
+export const isQueryStringValid = (url: string, queryStringScheme: string): boolean => {
+  const urlObject = URL.parse(url);
+
+  if (!urlObject.query) {
+    return false;
+  }
+
+  const queryObject = QS.parse(urlObject.query);
+
+  const queryStringOptionNames = queryStringScheme.split('&');
+
+  return queryStringOptionNames.every(optionName => {
+    // doesn't matter if the option is present or not when optional
+    if (optionName.endsWith('?')) {
+      return true;
+    }
+
+    return queryObject[optionName];
+  });
+}
+
+export const isUrlValid = (url: string, urlScheme: string): boolean => {
+  if (!isRelativeUrl(urlScheme) && !urlScheme.startsWith('?')) {
+    console.warn('Non-relative URL schemes are not supported');
+  }
+
+  const [pathNameScheme, queryStringScheme] = urlScheme.split('?') as (string | undefined)[];
+
+  return (
+    (!pathNameScheme || isPathNameValid(url, pathNameScheme)) &&
+    (!queryStringScheme || isQueryStringValid(url, queryStringScheme))
+  );
 }
 
 const splitPathName = (pathName: string): string[] => {
