@@ -34,7 +34,7 @@ export const downloadSubmission = async (url: string, tempDir: string, options: 
   const isFileStory = submission.file.isStory();
 
   if (!isFileStory) {
-    state.error('parsingFile', 'The submission file is not a text or a document');
+    state.error('parsingFile', `The submission file is not a text or a document. The file extension is ${submission.file.extension}`);
   }
 
   const wordCount = (file?.destFile && isFileStory)

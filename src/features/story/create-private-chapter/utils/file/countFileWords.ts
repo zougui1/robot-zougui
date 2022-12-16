@@ -1,15 +1,14 @@
 import createDebug from 'debug';
 import chalk from 'chalk';
-import { getText } from 'any-text';
 import _ from 'radash';
 
 import { DownloadState } from './types';
-import { splitWords } from '../../../../../utils';
+import { splitWords, readText } from '../../../../../utils';
 
-const debug = createDebug('robot-zougui:story:create-chapter:submission:count-words');
+const debug = createDebug('robot-zougui:story:create-private-chapter:submission:count-words');
 
 export const countFileWords = async (filePath: string, state: DownloadState): Promise<number | undefined> => {
-  const [error, text] = await _.try(getText)(filePath);
+  const [error, text] = await _.try(readText)(filePath);
 
   if (error) {
     debug(chalk.red('[ERROR]'), error);
@@ -18,7 +17,6 @@ export const countFileWords = async (filePath: string, state: DownloadState): Pr
   }
 
   state.finish('parsingFile');
-
   const words = splitWords(text);
   state.finish('countingWords');
 

@@ -1,6 +1,6 @@
 {
   "name": "@zougui/robot-zougui",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -36,6 +36,7 @@
   "author": "Zougui",
   "license": "ISC",
   "dependencies": {
+    "@iarna/rtf-to-html": "^1.1.0",
     "@notionhq/client": "^2.2.2",
     "@zougui/common.ms": "^0.2.0",
     "@zougui/common.music-repo": "^0.3.0",

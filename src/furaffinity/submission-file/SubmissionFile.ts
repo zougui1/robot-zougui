@@ -4,7 +4,7 @@ import { Category } from 'furaffinity-api';
 
 import { downloadSubmissionFile } from './utils';
 
-const storyExtensions = ['.txt', '.doc', '.docx', '.pdf'];
+const storyExtensions = ['.txt', '.doc', '.docx', '.pdf', '.rtf'];
 
 export class SubmissionFile {
   url: string;

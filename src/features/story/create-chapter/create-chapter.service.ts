@@ -56,7 +56,7 @@ export class CreateChapterService extends StoryService {
     const existingChapter = findChapterByUrl(similarChapters, url);
 
     if (existingChapter) {
-      throw new Error(`The URL "${url}" has already been downloaded under the name "${existingChapter.properties.Name.text}"`);
+      //throw new Error(`The URL "${url}" has already been downloaded under the name "${existingChapter.properties.Name.text}"`);
     }
   }
 
