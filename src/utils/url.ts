@@ -83,3 +83,39 @@ export const removeQueryString = (url: string): string => {
 
   return joinUrl(origin, urlObject.pathname);
 }
+
+export const parsePathParams = <T extends string>(url: string, pathNameScheme: T): ParsePathParams<T> => {
+  const urlObject = URL.parse(url);
+
+  if (!isPathNameValid(url, pathNameScheme) || !urlObject.pathname) {
+    throw new Error(`The URL "${url}" is invalid`);
+  }
+
+  const params: ParsePathParams<T> = {} as ParsePathParams<T>;
+
+  const urlPathNameParts = splitPathName(urlObject.pathname);
+  const pathNameSchemeParts = splitPathName(pathNameScheme);
+
+  urlPathNameParts.forEach((urlPathName, index) => {
+    const pathNameScheme = pathNameSchemeParts[index];
+
+    if (!pathNameScheme.startsWith(':')) {
+      return;
+    }
+
+    const paramName = pathNameScheme.slice(1);
+    params[paramName as keyof ParsePathParams<T>] = urlPathName as ParsePathParams<T>[keyof ParsePathParams<T>];
+  });
+
+  return params;
+}
+
+type ParsePathParams<T extends string> = T extends `${string}:${infer Param}/${infer Rest}`
+  ? { [K in Param]: string } & ParsePathParams<Rest>
+    : T extends `${string}:${infer Param}?`
+      ? { [K in Param]?: string | undefined }
+      : T extends `${string}:${infer Param}?/${infer Rest}`
+        ? { [K in Param]?: string | undefined } & ParsePathParams<Rest>
+          : T extends `${string}:${infer Param}`
+            ? { [K in Param]: string }
+  : {};

@@ -29,6 +29,7 @@ const getProdEnv = () => {
       icons: {
         success: env.get('DISCORD.ICONS.SUCCESS').required().asString(),
         running: env.get('DISCORD.ICONS.RUNNING').required().asString(),
+        warning: env.get('DISCORD.ICONS.WARNING').required().asString(),
         error: env.get('DISCORD.ICONS.ERROR').required().asString(),
       },
     },
@@ -78,6 +79,8 @@ const getProdEnv = () => {
         b: env.get('FURAFFINITY.COOKIE.B').required().asString(),
       },
     },
+
+    supportedStoryFileExtensions: ['.txt', '.doc', '.docx', '.pdf', '.rtf'],
   };
 }
 

@@ -5,7 +5,7 @@ import _ from 'radash'
 import { findStorySubmission } from './findStorySubmission';
 import { countFileWords } from './countFileWords';
 import { createDownloadState } from './createDownloadState';
-import { Submission } from '../../../../../furaffinity';
+import { Submission } from '../../../../../external-source';
 
 const debug = createDebug('robot-zougui:story:create-chapter:submission:download');
 
@@ -37,8 +37,13 @@ export const downloadSubmission = async (url: string, tempDir: string, options: 
     state.error('parsingFile', `The submission file is not a text or a document. The file extension is ${submission.file.extension}`);
   }
 
+  console.log('submission.file.isEmptyExtension', submission.file.isEmptyExtension())
+  const parseWarning = submission.file.isEmptyExtension()
+    ? `No file extension found. Extension inferred as ${submission.file.extension}`
+    : undefined;
+
   const wordCount = (file?.destFile && isFileStory)
-    ? await countFileWords(file.destFile, state)
+    ? await countFileWords(file.destFile, state,  { parseWarning })
     : undefined;
 
   // give time for the state to emit the events before removing the listener

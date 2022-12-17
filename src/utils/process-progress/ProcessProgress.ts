@@ -12,6 +12,10 @@ export class ProcessProgress {
         ...options.running,
         icon: options.running.icon ?? ProcessProgress.defaultIcons.running,
       },
+      warning: options.warning ? {
+        ...options.warning,
+        icon: options.warning.icon ?? ProcessProgress.defaultIcons.warning,
+      } : undefined,
       error: {
         ...options.error,
         icon: options.error.icon ?? ProcessProgress.defaultIcons.error,
@@ -45,13 +49,15 @@ export class ProcessProgress {
   }
 }
 
-export type Status = 'running' | 'error' | 'success';
+export type Status = 'running' | 'error' | 'warning' | 'success';
 
 export interface AddStepOptions {
   title: string;
   success: StepMessage;
   running: StepMessage;
+  warning?: StepMessage | undefined;
   error: StepMessage;
   done: boolean;
   errored: boolean;
+  warned?: boolean | undefined;
 }

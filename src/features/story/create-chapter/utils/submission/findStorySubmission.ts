@@ -1,4 +1,4 @@
-import { Submission } from '../../../../../furaffinity';
+import { Submission } from '../../../../../external-source';
 
 export const findStorySubmission = async (url: string): Promise<Submission> => {
   const submission = await Submission.find(url);

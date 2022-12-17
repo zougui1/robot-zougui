@@ -21,11 +21,17 @@ export class ProcessState<Steps extends string = ''> extends Emittery<ProcessSta
           ...options.error,
           content: options.error?.content ?? ProcessState.#defaultErrorMessage,
         },
+        warning: {
+          ...options.warning,
+          content: options.warning?.content ?? options.success.content,
+        },
       },
       state: {
         done: false,
         errored: false,
         errorMessage: undefined,
+        warned: false,
+        warningMessage: undefined,
       },
     };
 
@@ -45,6 +51,13 @@ export class ProcessState<Steps extends string = ''> extends Emittery<ProcessSta
     return this;
   }
 
+  warn(id: Steps, warningMessage?: string | undefined): this {
+    this.#steps[id].state.warned = true;
+    this.#steps[id].state.warningMessage = warningMessage;
+    this.update();
+    return this;
+  }
+
   getProgressString(): string {
     const steps = _.sort(Object.values<Step>(this.#steps), step => step.index);
     const progress = new ProcessProgress();
@@ -56,6 +69,10 @@ export class ProcessState<Steps extends string = ''> extends Emittery<ProcessSta
         error: {
           ...step.options.error,
           content: step.state.errorMessage || step.options.error.content,
+        },
+        warning: {
+          ...step.options.warning,
+          content: step.state.warningMessage || step.options.warning.content,
         },
       });
     }
@@ -74,6 +91,7 @@ export interface AddStateStepOptions {
   success: StepMessage;
   running: StepMessage;
   error?: Partial<StepMessage> | undefined;
+  warning?: Partial<StepMessage> | undefined;
 }
 
 type Step = {
@@ -82,6 +100,7 @@ type Step = {
     success: StepMessage;
     running: StepMessage;
     error: StepMessage;
+    warning: StepMessage;
   };
   state: StepState;
   index: number;
@@ -91,6 +110,8 @@ type StepState = {
   done: boolean;
   errored: boolean;
   errorMessage?: string | undefined;
+  warned: boolean;
+  warningMessage?: string | undefined;
 }
 
 export interface ProcessStateEventMap {

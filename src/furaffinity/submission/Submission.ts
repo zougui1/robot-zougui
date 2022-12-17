@@ -2,6 +2,7 @@ import { Rating, Category, Species, Gender, ISubmission } from 'furaffinity-api'
 import { DateTime } from 'luxon';
 
 import { findSubmission } from './queries';
+import { isValidSubmissionUrl } from './utils';
 import { Author } from '../author';
 import { SubmissionFile } from '../submission-file';
 
@@ -28,6 +29,10 @@ export class Submission {
       return new Submission(maybeSubmission);
     }
   }
+
+  static isValidUrl = (url: string): boolean => {
+    return isValidSubmissionUrl(url);
+  }
   //#endregion
 
   constructor(submission: ISubmission) {
@@ -51,8 +56,4 @@ export class Submission {
     return this.category === Category.Story;
   }
   //#endregion
-}
-
-export interface DownloadToDirOptions {
-  spoiler?: boolean | undefined;
 }

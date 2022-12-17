@@ -1,2 +1,2 @@
 import './program';
-//import './test2';
+//import './test';

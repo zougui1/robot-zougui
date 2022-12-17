@@ -38,6 +38,7 @@ const createProgram = async (): Promise<Program> => {
   ProcessProgress.defaultIcons.running = env.discord.icons.running;
   ProcessProgress.defaultIcons.error = env.discord.icons.error;
   ProcessProgress.defaultIcons.success = env.discord.icons.success;
+  ProcessProgress.defaultIcons.warning = env.discord.icons.warning;
 
   await program.parse();
   Furaffinity.login(env.furaffinity.cookie.a, env.furaffinity.cookie.b);

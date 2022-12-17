@@ -1,16 +1,9 @@
 import path from 'node:path';
 
-import { Furaffinity } from '../../Furaffinity';
-import { isPathNameValid } from '../../../utils';
-
-const submissionPathNameScheme = '/view/:id';
+import { isValidSubmissionUrl } from './isValidSubmissionUrl';
 
 export const getSubmissionId = (url: string): string => {
-  if (!Furaffinity.isValidUrl(url)) {
-    throw new Error('Invalid URL');
-  }
-
-  if (!isPathNameValid(url, submissionPathNameScheme)) {
+  if (!isValidSubmissionUrl(url)) {
     throw new Error('Invalid submission URL');
   }
 

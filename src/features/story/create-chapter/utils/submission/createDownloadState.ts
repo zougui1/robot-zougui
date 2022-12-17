@@ -16,6 +16,7 @@ export const createDownloadState = (): DownloadState => {
     .addStep('parsingFile', {
       title: 'Parsing file',
       success: { content: 'Parsed' },
+      warning: { content: 'Parsed' },
       running: { content: 'Parsing...' },
     })
     .addStep('countingWords', {

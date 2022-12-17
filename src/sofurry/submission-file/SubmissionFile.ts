@@ -1,8 +1,9 @@
 import path from 'node:path';
 
-import { Category } from 'furaffinity-api';
+import { prefixWith } from '@zougui/common.string-utils';
 
 import { downloadSubmissionFile } from './utils';
+import type { ContentType } from '../submission';
 import env from '../../env';
 
 const storyExtensions = env.supportedStoryFileExtensions;
@@ -11,13 +12,15 @@ export class SubmissionFile {
   url: string;
   name: string;
   extension: string;
-  readonly #category: Category;
+  readonly #type: ContentType;
+  readonly #originalExtension: string;
 
-  constructor(url: string, category: Category) {
+  constructor(url: string, fileName: string, fileExtension: string, type: ContentType) {
     this.url = url;
-    this.name = path.basename(url);
-    this.extension = path.extname(this.name);
-    this.#category = category;
+    this.#originalExtension = prefixWith(fileExtension, '.');
+    this.extension = getFileExtension(this.#originalExtension);
+    this.name = fileName.split('.').slice(0, -1).join('.') + this.extension;
+    this.#type = type;
   }
 
   downloadToDir = async (dirPath: string, options?: DownloadToDirOptions | undefined): Promise<{ destFile: string }> => {
@@ -26,7 +29,7 @@ export class SubmissionFile {
       : this.name;
 
     const destFile = path.join(dirPath, fileName);
-    await downloadSubmissionFile(this.url, destFile, this.#category);
+    await downloadSubmissionFile(this.url, destFile, this.#type);
 
     return { destFile };
   }
@@ -36,7 +39,7 @@ export class SubmissionFile {
   }
 
   isEmptyExtension = (): boolean => {
-    return isEmptyExtension(this.extension);
+    return isEmptyExtension(this.#originalExtension);
   }
 
   //#region type checks
@@ -48,6 +51,10 @@ export class SubmissionFile {
 
 export interface DownloadToDirOptions {
   spoiler?: boolean | undefined;
+}
+
+const getFileExtension = (extension: string): string => {
+  return isEmptyExtension(extension) ? '.txt' : extension;
 }
 
 const isEmptyExtension = (extension: string): boolean => {
