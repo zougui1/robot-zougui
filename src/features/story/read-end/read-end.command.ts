@@ -12,6 +12,7 @@ export const subCommandReadEnd = new Command('read-end')
     schema: z.boolean(),
   })
   .action(async ({ options, reply }) => {
+    reply.defer();
     const service = new ReadEndService();
     const result = await service.stopReadingStory({
       ...options,

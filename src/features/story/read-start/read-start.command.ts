@@ -14,6 +14,7 @@ export const subCommandReadStart = new Command('read-start')
     schema: z.boolean(),
   })
   .action(async ({ options, reply }) => {
+    reply.defer();
     const service = new ReadStartService();
 
     const result = await service.startReadingStory({

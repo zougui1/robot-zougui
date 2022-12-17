@@ -23,6 +23,7 @@ export const subCommandDownload = new Command('download')
   })
   .addOption(playlistOption)
   .action(async ({ options, reply }) => {
+    reply.defer();
     const service = new DownloadService();
 
     const result = await service.downloadMusic({

@@ -8,6 +8,7 @@ export const subCommandWatchStart = new Command('watch-start')
   .addOption(createNameOption({ watching: false }))
   .addOption(seasonsOption)
   .action(async ({ options, reply }) => {
+    reply.defer();
     const service = new WatchStartService();
 
     const result = await service.startWatchingShow({
