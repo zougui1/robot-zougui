@@ -8,6 +8,7 @@ export const subCommandEnd = new Command('end')
   .description('stop fapping')
   .addOption(createContentOption())
   .action(async ({ options, reply }) => {
+    reply.defer();
     const service = new EndService();
 
     const { duration, content } = await service.finishLastFap({
