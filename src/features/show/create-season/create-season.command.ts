@@ -10,6 +10,8 @@ export const subCommandCreateSeason = new Command('create-season')
   .addOption(nameOption)
   .addOption(sourceOption)
   .action(async ({ options, reply }) => {
+    reply.defer();
+
     const service = new CreateSeasonService();
     await service.ensureUniqueShow(options);
 
@@ -28,5 +30,6 @@ export const subCommandCreateSeason = new Command('create-season')
     });
 
     const row = new ActionRowBuilder<ButtonBuilder>().addComponents(button);
-    await reply.sendComponents([row]);
+    reply.components = [row];
+    await reply.sendContent(options.name);
   });

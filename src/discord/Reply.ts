@@ -9,7 +9,7 @@ export class Reply {
   readonly message: MessageBuilder = new MessageBuilder();
   debug: boolean;
   #replied: boolean = false;
-  #components: BaseMessageOptions['components'];
+  components: BaseMessageOptions['components'];
   #originalReply: Message | undefined;
   readonly originalMessage: MessageBuilder = new MessageBuilder();
   #originalComponents: BaseMessageOptions['components'];
@@ -37,7 +37,7 @@ export class Reply {
   }
 
   async sendComponents(components: BaseMessageOptions['components']): Promise<Message<boolean>> {
-    this.#components = components;
+    this.components = components;
     return await this.reply();
   }
 
@@ -93,7 +93,7 @@ export class Reply {
   }
 
   removeComponents(): this {
-    this.#components = [];
+    this.components = [];
     return this;
   }
 
@@ -126,7 +126,7 @@ export class Reply {
 
       return await this.#queue.run(() => channel.send({
         content,
-        components: this.#components,
+        components: this.components,
         reply: { messageReference: originalReply },
       }));
     }
@@ -134,7 +134,7 @@ export class Reply {
     if (this.#replied) {
       return await this.#queue.run(() => this.#interaction.editReply({
         content,
-        components: this.#components,
+        components: this.components,
       }));
     }
 
@@ -142,7 +142,7 @@ export class Reply {
     return await this.#queue.run(() => this.#interaction.reply({
       content,
       fetchReply: true,
-      components: this.#components,
+      components: this.components,
     }));
   }
 }
