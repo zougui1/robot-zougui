@@ -1,10 +1,11 @@
-import { ChatInputCommandInteraction, SelectMenuInteraction, Message, BaseMessageOptions } from 'discord.js';
+import { SelectMenuInteraction, ButtonInteraction, ModalSubmitInteraction, Message, BaseMessageOptions } from 'discord.js';
 
 import { MessageBuilder } from './Message';
 import { getErrorMessage, Queue } from '../utils';
+import { ReplyableInteraction } from './types';
 
 export class Reply {
-  #interaction: ChatInputCommandInteraction | SelectMenuInteraction;
+  #interaction: ReplyableInteraction;
   readonly message: MessageBuilder = new MessageBuilder();
   debug: boolean;
   #replied: boolean = false;
@@ -14,7 +15,7 @@ export class Reply {
   #originalComponents: BaseMessageOptions['components'];
   #queue: Queue<Message> = new Queue();
 
-  constructor(interaction: ChatInputCommandInteraction | SelectMenuInteraction, options?: ReplyOptions | undefined) {
+  constructor(interaction: ReplyableInteraction, options?: ReplyOptions | undefined) {
     this.#interaction = interaction;
     this.debug = options?.debug ?? false;
   }
@@ -54,8 +55,12 @@ export class Reply {
   }
 
   async fetchOriginalReply(): Promise<Message<boolean>> {
-    if (!(this.#interaction instanceof SelectMenuInteraction)) {
-      throw new Error('The function "updateOriginalReply" must be used on a SelectMenuInteraction');
+    if (
+      !(this.#interaction instanceof SelectMenuInteraction) &&
+      !(this.#interaction instanceof ButtonInteraction) &&
+      !(this.#interaction instanceof ModalSubmitInteraction)
+    ) {
+      throw new Error('The function "updateOriginalReply" must be used on a component interaction');
     }
 
     const interaction = this.#interaction;

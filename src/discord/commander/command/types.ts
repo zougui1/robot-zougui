@@ -35,5 +35,3 @@ export interface CommandMiddlewareContext {
   interaction: ChatInputCommandInteraction;
   reply: Reply;
 }
-
-export type CommandMiddleware = (context: CommandMiddlewareContext) => (void | Promise<void>);

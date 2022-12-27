@@ -2,6 +2,7 @@ import { Client } from '@notionhq/client';
 import createDebug from 'debug';
 
 import { Show } from './show.model';
+import { Season } from './season.model';
 import env from '../../env';
 import { getFullPageList } from '../../notion';
 
@@ -43,10 +44,34 @@ export class ShowNotion {
 
     return getFullPageList(result.results, Show);
   }
+
+  findSeasons = async ({ showId }: FindShowSeasonsOptions): Promise<Season.Instance[]> => {
+    const result = await this.#client.databases.query({
+      database_id: env.notion.databases.seasons.id,
+      sorts: [
+        {
+          property: 'Index',
+          direction: 'ascending',
+        },
+      ],
+      filter: {
+        property: 'Show',
+        relation: {
+          contains: showId,
+        },
+      },
+    });
+
+    return getFullPageList(result.results, Season);
+  }
 }
 
 export interface GetShowListOptions {
   name: string;
   watching: boolean;
   nameComparison: 'equals' | 'contains';
+}
+
+export interface FindShowSeasonsOptions {
+  showId: string;
 }

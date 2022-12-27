@@ -20,15 +20,13 @@ export function createContentOption(options?: CreateContentOptionOptions | undef
     : enumSchema;
 
   return new Option('[content]')
-  .description('The content type you fapped to')
-  .schema(schema)
-  .autocomplete(({ value }) => {
-    const valueLower = value.toLowerCase();
+    .description('The content type you fapped to')
+    .schema(schema)
+    .autocomplete(({ value }) => {
+      const valueLower = value.toLowerCase();
 
-    return contents
-      .filter(content => content.toLowerCase().includes(valueLower))
-      .map(value => ({ value, name: value }));
-  });
+      return contents.filter(content => content.toLowerCase().includes(valueLower));
+    });
 }
 
 type ContentZodEnum = z.ZodEnum<[FapContentType.Art, FapContentType.Story, FapContentType.Imagination, FapContentType.RP]>;

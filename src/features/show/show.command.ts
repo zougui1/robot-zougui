@@ -1,5 +1,6 @@
 import { subCommandWatchStart } from './watch-start';
 import { subCommandWatchEnd } from './watch-end';
+import { subCommandCreateSeason } from './create-season';
 import { Command } from '../../discord';
 
 export const showCommand = new Command('show').description('Show command');
@@ -8,3 +9,4 @@ export type { } from 'zod';
 
 showCommand.addCommand(subCommandWatchStart);
 showCommand.addCommand(subCommandWatchEnd);
+showCommand.addCommand(subCommandCreateSeason);

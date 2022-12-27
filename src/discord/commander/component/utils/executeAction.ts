@@ -1,18 +1,19 @@
-import { SelectMenuInteraction } from 'discord.js';
 import _ from 'radash';
 import createDebug from 'debug';
 import chalk from 'chalk';
 
-import { logSelectMenu } from './logSelectMenu';
-import { SelectMenuActionContext, SelectMenuMiddleware } from '../types';
+import { logButton } from './logButton';
+import { ComponentActionContext } from '../types';
+import { Middleware } from '../../types';
+import { ComponentInteraction } from '../../../types';
 import { Reply } from '../../../Reply';
 
-const debug = createDebug('robot-zougui:command');
+const debug = createDebug('robot-zougui:discord:component');
 
 export const executeAction = async (options: ExecuteActionOptions): Promise<void> => {
   const { interaction, action, values, middlewares } = options;
 
-  logSelectMenu(options);
+  logButton(options);
   const reply = new Reply(interaction);
   reply.message.addOptions(values);
 
@@ -34,9 +35,10 @@ export const executeAction = async (options: ExecuteActionOptions): Promise<void
 }
 
 export interface ExecuteActionOptions {
-  interaction: SelectMenuInteraction;
-  selectMenuName: string;
+  componentType: string;
+  interaction: ComponentInteraction;
+  buttonName: string;
   values: Record<string, string>;
-  action: (context: SelectMenuActionContext<Record<string, string>>) => void | Promise<void>;
-  middlewares: SelectMenuMiddleware[];
+  action: (context: ComponentActionContext<ComponentInteraction, Record<string, string>>) => void | Promise<void>;
+  middlewares: Middleware[];
 }

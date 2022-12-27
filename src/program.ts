@@ -5,7 +5,7 @@ import './pretty-error';
 import { Program } from './discord';
 import { Furaffinity } from './furaffinity';
 import { fapCommand } from './features/fap';
-import { showCommand } from './features/show';
+import { showCommand, newButton, seasonModal } from './features/show';
 import { storyCommand } from './features/story';
 import { musicCommand, musicNamingSelectMenu } from './features/music';
 import { createAuthorizer, createChannelWhitelist } from './middlewares';
@@ -34,6 +34,10 @@ const createProgram = async (): Promise<Program> => {
   program.addCommand(musicCommand);
 
   program.addSelectMenu(musicNamingSelectMenu);
+
+  program.addButton(newButton);
+
+  program.addModal(seasonModal);
 
   ProcessProgress.defaultIcons.running = env.discord.icons.running;
   ProcessProgress.defaultIcons.error = env.discord.icons.error;

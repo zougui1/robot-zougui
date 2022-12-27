@@ -37,7 +37,6 @@ export const downloadSubmission = async (url: string, tempDir: string, options: 
     state.error('parsingFile', `The submission file is not a text or a document. The file extension is ${submission.file.extension}`);
   }
 
-  console.log('submission.file.isEmptyExtension', submission.file.isEmptyExtension())
   const parseWarning = submission.file.isEmptyExtension()
     ? `No file extension found. Extension inferred as ${submission.file.extension}`
     : undefined;

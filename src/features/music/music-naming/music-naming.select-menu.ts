@@ -8,10 +8,7 @@ export const musicNamingSelectMenu = new SelectMenu('music-naming')
     const service = new MusicNamingService();
     const [value] = interaction.values;
 
-    console.log('options:', options)
-
     await reply.fetchOriginalReply();
-    reply.removeOriginalComponents();
 
     switch (value) {
       case MusicNamingOption.originalFileName:

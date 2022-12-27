@@ -4,8 +4,16 @@ import createDebug from 'debug';
 
 import { ClientState } from './ClientState';
 import { createInteractionHandler, logCreatedCommands } from './utils';
-import { Command, CommandMap, CommandMiddleware } from '../command';
-import { SelectMenu, SelectMenuMap, SelectMenuMiddleware } from '../select-menu';
+import { Command, CommandMap } from '../command';
+import { ComponentMap } from '../component';
+import {
+  AnyButton,
+  ButtonMap,
+  AnySelectMenu,
+  SelectMenuMap,
+  AnyModal,
+  ModalMap,
+} from '../components';
 import { Middleware } from '../types';
 import { initializeCommands, } from '../../utils';
 import { onceProgramExit } from '../../../utils';
@@ -14,7 +22,9 @@ const debug = createDebug('robot-zougui:discord');
 
 export class Program {
   readonly commands: CommandMap = new CommandMap();
-  readonly selectMenus: SelectMenuMap = new SelectMenuMap();
+  readonly selectMenus: SelectMenuMap = new ComponentMap();
+  readonly buttons: ButtonMap = new ComponentMap();
+  readonly modals: ModalMap = new ComponentMap();
   readonly #client: Client;
   readonly #rest: REST;
   readonly #token: string;
@@ -33,22 +43,26 @@ export class Program {
   }
 
   addCommand(command: Command<any>): this {
-    // gotta copy the array as its referenced value is modified by `this.use`
-    // it is safe to assume those middlewares are of type CommandMiddleware
-    // as the only different is in the type of interaction and its type is
-    // handled in the middlewares themselves
-    command.addMiddlewares([...this.#middlewares] as CommandMiddleware[]);
+    command.addMiddlewares([...this.#middlewares]);
     this.commands.add(command);
     return this;
   }
 
-  addSelectMenu(selectMenu: SelectMenu<any>): this {
+  addSelectMenu(selectMenu: AnySelectMenu): this {
     this.selectMenus.add(selectMenu);
-    // gotta copy the array as its referenced value is modified by `this.use`
-    // it is safe to assume those middlewares are of type SelectMenuMiddleware
-    // as the only different is in the type of interaction and its type is
-    // handled in the middlewares themselves
-    selectMenu.addMiddlewares([...this.#middlewares] as SelectMenuMiddleware[]);
+    selectMenu.addMiddlewares([...this.#middlewares]);
+    return this;
+  }
+
+  addButton(button: AnyButton): this {
+    this.buttons.add(button);
+    button.addMiddlewares([...this.#middlewares]);
+    return this;
+  }
+
+  addModal(modal: AnyModal): this {
+    this.modals.add(modal);
+    modal.addMiddlewares([...this.#middlewares]);
     return this;
   }
 
@@ -64,6 +78,7 @@ export class Program {
 
   destroy(): void {
     this.selectMenus.destroy();
+    this.buttons.destroy();
     this.#client.destroy();
   }
 
@@ -74,7 +89,12 @@ export class Program {
 
     if (result.success) {
       logCreatedCommands(commands);
-      this.#client.on('interactionCreate', createInteractionHandler(this.commands, this.selectMenus));
+      this.#client.on('interactionCreate', createInteractionHandler({
+        commands: this.commands,
+        selectMenus: this.selectMenus,
+        buttons: this.buttons,
+        modals: this.modals,
+      }));
       await this.#state.setInitializedPresence();
     } else {
       await this.#state.setInitializationErrorPresence();

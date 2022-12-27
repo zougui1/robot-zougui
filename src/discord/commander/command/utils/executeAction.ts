@@ -6,7 +6,7 @@ import chalk from 'chalk';
 import { cleanReply } from './cleanReply';
 import { logCommand } from './logCommand';
 import { ActionContext } from '../types';
-import { CommandMiddleware } from '../types';
+import { Middleware } from '../../types';
 import { Reply } from '../../../Reply';
 import { onceProgramExit } from '../../../../utils';
 
@@ -56,5 +56,5 @@ export interface ExecuteActionOptions {
   rawValues: Record<string, unknown>;
   action: (context: ActionContext<Record<string, unknown>>) => void | Promise<void>;
   debug?: boolean | undefined;
-  middlewares: CommandMiddleware[];
+  middlewares: Middleware[];
 }

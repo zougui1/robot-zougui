@@ -3,27 +3,45 @@ import createDebug from 'debug';
 import chalk from 'chalk';
 
 import { handleCommandInteraction } from './handleCommandInteraction';
-import { handleSelectMenuInteraction } from './handleSelectMenuInteraction';
 import { handleAutocompleteInteraction } from './handleAutocompleteInteraction';
 import { CommandMap } from '../../command';
-import { SelectMenuMap } from '../../select-menu';
+import {
+  ButtonMap,
+  SelectMenuMap,
+  ModalMap,
+} from '../../components';
 
 const debug = createDebug('robot-zougui:discord:interaction');
 
-export const createInteractionHandler = (commands: CommandMap, selectMenus: SelectMenuMap) => async (interaction: Interaction): Promise<void> => {
+export const createInteractionHandler = (options: CreateInteractionHandlerOptions) => async (interaction: Interaction): Promise<void> => {
   try {
     if (interaction.isAutocomplete()) {
-      return await handleAutocompleteInteraction(interaction, commands);
+      return await handleAutocompleteInteraction(interaction, options.commands);
     }
 
     if (interaction.isChatInputCommand()) {
-      return await handleCommandInteraction(interaction, commands);
+      return await handleCommandInteraction(interaction, options.commands);
     }
 
     if (interaction.isSelectMenu()) {
-      return await handleSelectMenuInteraction(interaction, selectMenus);
+      return await options.selectMenus.execute(interaction);
+    }
+
+    if (interaction.isButton()) {
+      return await options.buttons.execute(interaction);
+    }
+
+    if (interaction.isModalSubmit()) {
+      return await options.modals.execute(interaction);
     }
   } catch (error) {
     debug(chalk.redBright('[ERROR]'), error);
   }
+}
+
+export interface CreateInteractionHandlerOptions {
+  commands: CommandMap;
+  selectMenus: SelectMenuMap;
+  buttons: ButtonMap;
+  modals: ModalMap;
 }

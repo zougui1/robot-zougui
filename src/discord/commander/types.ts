@@ -1,13 +1,7 @@
 import { z } from 'zod';
-import {
-  AutocompleteInteraction,
-  ChatInputCommandInteraction,
-  SelectMenuInteraction,
-} from 'discord.js';
 
-import { CommandMiddleware, CommandMiddlewareContext } from './command';
-import { SelectMenuMiddleware, SelectMenuMiddlewareContext } from './select-menu';
 import { Reply } from '../Reply';
+import { ReplyableInteraction } from '../types';
 
 export type ArgumentString = `<"${string}...">` | `["${string}..."]` | `<${string}...>` | `[${string}...]` | `<${string}>` | `[${string}]`;
 export type SchemaOrDefault<Schema extends z.Schema | void, Default extends z.Schema> = Schema extends void ? Default : Schema;
@@ -46,9 +40,9 @@ export type OptionalArraySchema<T extends z.Schema | void, Default extends z.Sch
   MaybeOptional<SchemaOrDefault<T, Default>, z.ZodArray<SchemaOrDefault<T, Default>>>
 );
 
-export type MiddlewareContext = (
-  | CommandMiddlewareContext
-  | SelectMenuMiddlewareContext
-)
+export interface MiddlewareContext {
+  interaction: ReplyableInteraction;
+  reply: Reply;
+}
 
-export type Middleware = CommandMiddleware | SelectMenuMiddleware;
+export type Middleware = (context: MiddlewareContext) => void | Promise<void>;
