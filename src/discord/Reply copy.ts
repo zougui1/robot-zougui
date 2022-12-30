@@ -21,10 +21,8 @@ export class Reply {
   }
 
   async toggleDebug(): Promise<void> {
-    await this.#queue.run(async () => {
-      this.debug = !this.debug;
-      return await this._reply();
-    });
+    this.debug = !this.debug;
+    await this.reply();
   }
 
   async disableDebug(): Promise<void> {
@@ -34,24 +32,18 @@ export class Reply {
   }
 
   async sendContent(content: string): Promise<Message<boolean>> {
-    return await this.#queue.run(async () => {
-      this.message.reply.content = content;
-      return await this._reply();
-    });
+    this.message.reply.content = content;
+    return await this.reply();
   }
 
   async sendComponents(components: BaseMessageOptions['components']): Promise<Message<boolean>> {
-    return await this.#queue.run(async () => {
-      this.components = components;
-      return await this._reply();
-    });
+    this.components = components;
+    return await this.reply();
   }
 
   async respond(label: string, content?: string | undefined): Promise<Message<boolean>> {
-    return await this.#queue.run(async () => {
-      this.message.setResponse(label, content);
-      return await this._reply();
-    });
+    this.message.setResponse(label, content);
+    return await this.reply();
   }
 
   async respondSuccess(label: string, content?: string | undefined): Promise<Message<boolean>> {
@@ -117,11 +109,7 @@ export class Reply {
     }));
   }
 
-  async reply(): Promise<Message> {
-    return await this.#queue.run(async () => await this._reply());
-  }
-
-  private async _reply(): Promise<Message<boolean>> {
+  async reply(): Promise<Message<boolean>> {
     if (this.debug) {
       this.message.reply.content ||= '*No content*';
     }
@@ -136,26 +124,26 @@ export class Reply {
       const { channel } = this.#interaction;
       const originalReply = this.#originalReply;
 
-      return await channel.send({
+      return await this.#queue.run(() => channel.send({
         content,
         components: this.components,
         reply: { messageReference: originalReply },
-      });
+      }));
     }
 
     if (this.#replied) {
-      return await this.#interaction.editReply({
+      return await this.#queue.run(() => this.#interaction.editReply({
         content,
         components: this.components,
-      });
+      }));
     }
 
     this.#replied = true;
-    return await this.#interaction.reply({
+    return await this.#queue.run(() => this.#interaction.reply({
       content,
       fetchReply: true,
       components: this.components,
-    });
+    }));
   }
 }
 

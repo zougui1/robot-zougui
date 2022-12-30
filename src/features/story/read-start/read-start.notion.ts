@@ -10,7 +10,7 @@ import { getFullPageList } from '../../../notion';
 export class ReadStartNotion extends StoryNotion {
   readonly #client: Client = new Client({ auth: env.notion.token });
 
-  findChapters = async ({ storyId }: FindStoryChaptersOptions): Promise<Chapter.Instance[]> => {
+  findChapters = async ({ storyId }: FindChaptersOptions): Promise<Chapter.Instance[]> => {
     const result = await this.#client.databases.query({
       database_id: env.notion.databases.chapters.id,
       sorts: [
@@ -67,7 +67,7 @@ export class ReadStartNotion extends StoryNotion {
   }
 }
 
-export interface FindStoryChaptersOptions {
+export interface FindChaptersOptions {
   storyId: string;
 }
 

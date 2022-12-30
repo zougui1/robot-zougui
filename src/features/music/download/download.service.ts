@@ -29,6 +29,7 @@ export class DownloadService {
 
   async downloadMusic(options: DownloadMusicOptions): Promise<DownloadMusicResult> {
     const { playlistName, url } = options;
+    const progressPromises: (Promise<void> | void)[] = [];
 
     const playlist = await this.#repo.getPlaylist(playlistName);
     const playlistExists = await playlist?.getExists();
@@ -50,25 +51,31 @@ export class DownloadService {
 
     let lastState: DownloadState | undefined;
 
+    const handleProgress = (progress: string): void => {
+      progressPromises.push(options.onProgress(progress));
+    }
+
     downloader.parser.on('message', ({ parser }) => {
       lastState = _.clone(parser.state);
-      options.onProgress(getProgressMessage(parser.state));
+      handleProgress(getProgressMessage(parser.state));
     });
 
     const [downloadError, result] = await _.try(downloader.exec)();
 
     if (downloadError) {
       if (lastState) {
-        options.onProgress(getProgressMessage(lastState, true));
+        handleProgress(getProgressMessage(lastState, true));
       }
 
       throw downloadError;
     }
 
-    options.onProgress(getProgressionFinishedMessage());
+    handleProgress(getProgressionFinishedMessage());
 
     const originalMusic = new Music(result.destFile);
     const standardMusic = Music.tryParseUnknownPath(result.destFile);
+
+    await Promise.all(progressPromises);
 
     return {
       originalMusic,
@@ -80,7 +87,7 @@ export class DownloadService {
 export interface DownloadMusicOptions {
   url: string;
   playlistName: string;
-  onProgress: (progress: string) => void,
+  onProgress: (progress: string) => void | Promise<void>,
 }
 
 export interface DownloadMusicResult {

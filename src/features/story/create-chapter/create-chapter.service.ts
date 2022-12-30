@@ -26,11 +26,16 @@ export class CreateChapterService extends StoryService {
 
   createChapterFromSubmission = async (options: CreateChapterFromSubmissionOptions): Promise<CreateChapterResult> => {
     const cleanUrl = removeTrailingSlash(removeQueryString(options.url));
+    const progressPromises: (Promise<void> | void)[] = [];
+
+    const handleProgress = (progress: string): void => {
+      progressPromises.push(options.onProgress(progress));
+    }
 
     await this.checkChapterUrl(cleanUrl);
 
     const submission = await downloadSubmission(options.url, env.tempDir, {
-      onProgress: state => options.onProgress(state.progressString),
+      onProgress: state => handleProgress(state.progressString),
     });
 
     const [fileError, fileUrl] = submission.filePath
@@ -40,6 +45,8 @@ export class CreateChapterService extends StoryService {
     if (fileError) {
       debug(chalk.red('[ERROR]'), fileError);
     }
+
+    await Promise.all(progressPromises);
 
     return await this.createChapter({
       ...options,
@@ -197,7 +204,7 @@ export interface CreateChapterFromSubmissionOptions {
   index?: number | undefined;
   startRead?: boolean | undefined;
   startFap?: boolean | undefined;
-  onProgress: (progress: string) => void;
+  onProgress: (progress: string) => void | Promise<void>;
   getFileUrl: (file: Buffer, name: string) => Promise<string | undefined>;
 }
 

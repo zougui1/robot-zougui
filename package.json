@@ -1,6 +1,6 @@
 {
   "name": "@zougui/robot-zougui",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -39,8 +39,9 @@
   "dependencies": {
     "@iarna/rtf-to-html": "^1.1.0",
     "@notionhq/client": "^2.2.2",
+    "@zougui/common.child-process": "^0.3.0",
     "@zougui/common.ms": "^0.2.0",
-    "@zougui/common.music-repo": "^0.3.0",
+    "@zougui/common.music-repo": "^0.4.2",
     "@zougui/common.string-utils": "^0.2.0",
     "@zougui/common.url-utils": "^0.2.0",
     "any-text": "^1.2.0",

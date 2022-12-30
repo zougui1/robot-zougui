@@ -11,8 +11,9 @@ specifiers:
   '@types/minimatch': ^5.1.2
   '@types/node': ^18.11.9
   '@types/qs': ^6.9.7
+  '@zougui/common.child-process': ^0.3.0
   '@zougui/common.ms': ^0.2.0
-  '@zougui/common.music-repo': ^0.3.0
+  '@zougui/common.music-repo': ^0.4.2
   '@zougui/common.string-utils': ^0.2.0
   '@zougui/common.url-utils': ^0.2.0
   any-text: ^1.2.0
@@ -44,8 +45,9 @@ specifiers:
 dependencies:
   '@iarna/rtf-to-html': 1.1.0
   '@notionhq/client': 2.2.2
+  '@zougui/common.child-process': 0.3.0
   '@zougui/common.ms': 0.2.0
-  '@zougui/common.music-repo': 0.3.0
+  '@zougui/common.music-repo': 0.4.2
   '@zougui/common.string-utils': 0.2.0
   '@zougui/common.url-utils': 0.2.0
   any-text: 1.2.0
@@ -291,8 +293,8 @@ packages:
       pretty-ms: 7.0.1
     dev: false
 
-  /@zougui/common.music-repo/0.3.0:
-    resolution: {integrity: sha512-ZUQGqCKWWc30PYpzTFWnfI9MOEF8MDmKj5YEtaRSsu1rqCRRI7X3v8B/W3j86CTuTmKbW0YoWepB8Bh2jq2cKw==}
+  /@zougui/common.music-repo/0.4.2:
+    resolution: {integrity: sha512-TTLPpm5b7WuFOudWRVqC6i3q1Fr9oCVUf3JnwIZKSLT0JnoI2vD5bu93WJQEr4QM1bhOzxb646dd/cM12F01vQ==}
     dependencies:
       '@zougui/common.child-process': 0.3.0
       '@zougui/common.cli-logger': 0.1.1
@@ -302,7 +304,9 @@ packages:
       fast-levenshtein: 3.0.0
       fs-extra: 10.1.0
       lodash: 4.17.21
+      luxon: 3.1.1
       nanoid: 3.3.4
+      pretty-bytes: 5.6.0
       radash: 7.1.0
     dev: false
 
@@ -1458,6 +1462,11 @@ packages:
   /prelude-ls/1.1.2:
     resolution: {integrity: sha512-ESF23V4SKG6lVSGZgYNpbsiaAkdab6ZgOxe52p7+Kid3W3u3bxR4Vfd/o21dmN7jSt0IwgZ4v5MUd26FEtXE9w==}
     engines: {node: '>= 0.8.0'}
+    dev: false
+
+  /pretty-bytes/5.6.0:
+    resolution: {integrity: sha512-FFw039TmrBqFK8ma/7OL3sDz/VytdtJr044/QUJtH0wK9lb9jLq9tJyIxUwtQJHwar2BqtiA4iCWSwo9JLkzFg==}
+    engines: {node: '>=6'}
     dev: false
 
   /pretty-error/4.0.0:

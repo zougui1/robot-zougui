@@ -1,4 +1,4 @@
-import { Client } from '@notionhq/client';
+import { Client, LogLevel } from '@notionhq/client';
 import createDebug from 'debug';
 
 import { Show } from './show.model';
@@ -9,7 +9,7 @@ import { getFullPageList } from '../../notion';
 const debug = createDebug('robot-zougui:watch:notion');
 
 export class ShowNotion {
-  readonly #client: Client = new Client({ auth: env.notion.token });
+  readonly #client: Client = new Client({ auth: env.notion.token, logLevel: LogLevel.DEBUG });
 
   getShowList = async ({ name, watching, nameComparison }: GetShowListOptions): Promise<Show.Instance[]> => {
     debug(`Find the show "${name}" with status watching=${watching}`);
@@ -34,9 +34,9 @@ export class ShowNotion {
           },
           {
             property: 'Name',
-            title: nameComparison === 'equals' ? {
-              equals: name,
-            } : { contains: name },
+            title: nameComparison === 'equals'
+              ? { equals: name }
+              : { contains: name },
           },
         ],
       },

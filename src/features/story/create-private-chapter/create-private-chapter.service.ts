@@ -6,9 +6,17 @@ export class CreatePrivateChapterService {
   readonly #createChapter: CreateChapterService = new CreateChapterService();
 
   createChapter = async (options: CreateChapterOptions): Promise<CreateChapterResult> => {
+    const progressPromises: (Promise<void> | void)[] = [];
+
+    const handleProgress = (progress: string): void => {
+      progressPromises.push(options.onProgress(progress));
+    }
+
     const { filePath, wordCount } = await downloadFile(options.fileUrl, env.tempDir, options.fileName, {
-      onProgress: state => options.onProgress(state.progressString),
+      onProgress: state => handleProgress(state.progressString),
     });
+
+    await Promise.all(progressPromises);
 
     return await this.#createChapter.createChapter({
       ...options,

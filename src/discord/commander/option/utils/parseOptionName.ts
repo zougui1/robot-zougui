@@ -1,19 +1,13 @@
 import { z } from 'zod';
 
+import { removeSuffix, removePrefix } from '@zougui/common.string-utils';
+
 const unwrapType = (schema: z.Schema): any => {
   if (schema instanceof z.ZodOptional || schema instanceof z.ZodNullable) {
     return unwrapType(schema.unwrap());
   }
 
   return schema;
-}
-
-const removeSuffix = (text: string, suffix: string): string => {
-  return text.endsWith(suffix) ? text.slice(0, -suffix.length) : text;
-}
-
-const removePrefix = (text: string, prefix: string): string => {
-  return text.startsWith(prefix) ? text.slice(prefix.length) : text;
 }
 
 const removeSurroundings = (text: string, prefix: string, suffix: string): string => {
