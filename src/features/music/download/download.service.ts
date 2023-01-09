@@ -3,7 +3,7 @@ import * as _ from 'radash';
 import { PlaylistRepo, Youtube, Music } from '@zougui/common.music-repo';
 import { DownloadState } from '@zougui/common.music-repo/lib/youtube/downloader/parser';
 
-import { getProgressMessage, getProgressionFinishedMessage } from './utils';
+import { getFullProgressMessage, getProgressionFinishedMessage } from './utils';
 import { Exception } from '../../../error';
 import env from '../../../env';
 
@@ -50,21 +50,46 @@ export class DownloadService {
     });
 
     let lastState: DownloadState | undefined;
+    let lastFallbackState: DownloadState | undefined;
 
     const handleProgress = (progress: string): void => {
       progressPromises.push(options.onProgress(progress));
     }
 
     downloader.parser.on('message', ({ parser }) => {
-      lastState = _.clone(parser.state);
-      handleProgress(getProgressMessage(parser.state));
+      if (downloader.isUsingFallback) {
+        lastFallbackState = _.clone(parser.state);
+
+        handleProgress(getFullProgressMessage({
+          fallbackName: 'youtube-dl',
+          fallbackState: parser.state,
+          isUsingFallback: downloader.isUsingFallback,
+          mainState: lastState,
+        }));
+      } else {
+        lastState = _.clone(parser.state);
+
+        handleProgress(getFullProgressMessage({
+          fallbackName: 'youtube-dl',
+          isUsingFallback: downloader.isUsingFallback,
+          mainState: parser.state,
+        }));
+      }
     });
 
     const [downloadError, result] = await _.try(downloader.exec)();
 
     if (downloadError) {
-      if (lastState) {
-        handleProgress(getProgressMessage(lastState, true));
+      const actualLastState = lastFallbackState || lastState;
+
+      if (actualLastState) {
+        handleProgress(getFullProgressMessage({
+          fallbackName: 'youtube-dl',
+          fallbackState: lastFallbackState,
+          isUsingFallback: downloader.isUsingFallback,
+          mainState: lastState,
+          errored: true,
+        }));
       }
 
       throw downloadError;

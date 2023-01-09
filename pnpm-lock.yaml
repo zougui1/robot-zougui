@@ -13,7 +13,7 @@ specifiers:
   '@types/qs': ^6.9.7
   '@zougui/common.child-process': ^0.3.0
   '@zougui/common.ms': ^0.2.0
-  '@zougui/common.music-repo': ^0.4.2
+  '@zougui/common.music-repo': ^0.5.2
   '@zougui/common.string-utils': ^0.2.0
   '@zougui/common.url-utils': ^0.2.0
   any-text: ^1.2.0
@@ -47,7 +47,7 @@ dependencies:
   '@notionhq/client': 2.2.2
   '@zougui/common.child-process': 0.3.0
   '@zougui/common.ms': 0.2.0
-  '@zougui/common.music-repo': 0.4.2
+  '@zougui/common.music-repo': 0.5.2
   '@zougui/common.string-utils': 0.2.0
   '@zougui/common.url-utils': 0.2.0
   any-text: 1.2.0
@@ -293,8 +293,8 @@ packages:
       pretty-ms: 7.0.1
     dev: false
 
-  /@zougui/common.music-repo/0.4.2:
-    resolution: {integrity: sha512-TTLPpm5b7WuFOudWRVqC6i3q1Fr9oCVUf3JnwIZKSLT0JnoI2vD5bu93WJQEr4QM1bhOzxb646dd/cM12F01vQ==}
+  /@zougui/common.music-repo/0.5.2:
+    resolution: {integrity: sha512-F+maFvFbwDNDmqcBiQvYTx2bKD8GG8QLXxttCXHrjGqghYRbuaD3+Mj8InUo6S1ewNwh53C/8BZmmgm5NevjmA==}
     dependencies:
       '@zougui/common.child-process': 0.3.0
       '@zougui/common.cli-logger': 0.1.1
