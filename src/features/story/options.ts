@@ -14,6 +14,15 @@ export const createNameOption = ({ reading }: CreateNameOptionOptions): Option<'
     });
 }
 
+export const storyNameOption = new Option('<story-name>')
+  .description('Name of the story')
+  .autocomplete(async ({ value }) => {
+    const service = new StoryService();
+    const storyNames = await service.findMatchingStoryNames({ name: value });
+
+    return storyNames;
+  });
+
 export interface CreateNameOptionOptions {
   reading: boolean;
 }

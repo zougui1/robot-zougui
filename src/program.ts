@@ -6,7 +6,7 @@ import { Program } from './discord';
 import { Furaffinity } from './furaffinity';
 import { fapCommand } from './features/fap';
 import { showCommand, newButton, seasonModal } from './features/show';
-import { storyCommand } from './features/story';
+import { storyCommand, subCommandGetUrl } from './features/story';
 import { musicCommand, musicNamingSelectMenu } from './features/music';
 import { createAuthorizer, createChannelWhitelist } from './middlewares';
 import { Network, NetworkStatus, ProcessProgress } from './utils';
@@ -25,7 +25,12 @@ const createProgram = async (): Promise<Program> => {
 
   const program = new Program(client, env.discord);
 
-  program.use(createAuthorizer({ authorizedUserIds: [env.discord.authorizedUserId] }));
+  program.use(createAuthorizer({
+    authorizedUserIds: [env.discord.authorizedUserId],
+    publicCommands: {
+      [storyCommand.name]: [subCommandGetUrl.name],
+    },
+  }));
   program.use(createChannelWhitelist({ channelIds: env.discord.channelIds.all }));
 
   program.addCommand(fapCommand);

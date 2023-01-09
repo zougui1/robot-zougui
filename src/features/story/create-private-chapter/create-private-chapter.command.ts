@@ -5,7 +5,7 @@ import chalk from 'chalk';
 import { toMs } from '@zougui/common.ms';
 
 import { CreatePrivateChapterService } from './create-private-chapter.service';
-import { storyNameOption } from '../create-chapter/options';
+import { storyNameOption } from '../options';
 import { Command } from '../../../discord';
 import { createChannelWhitelist } from '../../../middlewares';
 import env from '../../../env';

@@ -4,7 +4,7 @@ import createDebug from 'debug';
 import chalk from 'chalk';
 
 import { CreateChapterService } from './create-chapter.service';
-import { storyNameOption } from './options';
+import { storyNameOption } from '../options';
 import { Command } from '../../../discord';
 
 const debug = createDebug('robot-zougui:story:create-chapter:command');

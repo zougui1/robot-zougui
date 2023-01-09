@@ -55,6 +55,8 @@ export interface ParseNumberListOptions {
 }
 
 export const parseListableNumber = (text: string, options?: ParseListableNumberOptions | undefined): number[] => {
+  text = text.replace(' to ', '-');
+
   if (text.includes('-')) {
     return parseRange(text, options);
   }
