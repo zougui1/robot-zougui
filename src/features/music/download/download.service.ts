@@ -30,6 +30,7 @@ export class DownloadService {
   async downloadMusic(options: DownloadMusicOptions): Promise<DownloadMusicResult> {
     const { playlistName, url } = options;
     const progressPromises: (Promise<void> | void)[] = [];
+    const fallbackName = 'youtube-dl';
 
     const playlist = await this.#repo.getPlaylist(playlistName);
     const playlistExists = await playlist?.getExists();
@@ -61,7 +62,7 @@ export class DownloadService {
         lastFallbackState = _.clone(parser.state);
 
         handleProgress(getFullProgressMessage({
-          fallbackName: 'youtube-dl',
+          fallbackName,
           fallbackState: parser.state,
           isUsingFallback: downloader.isUsingFallback,
           mainState: lastState,
@@ -70,7 +71,7 @@ export class DownloadService {
         lastState = _.clone(parser.state);
 
         handleProgress(getFullProgressMessage({
-          fallbackName: 'youtube-dl',
+          fallbackName,
           isUsingFallback: downloader.isUsingFallback,
           mainState: parser.state,
         }));
@@ -84,7 +85,7 @@ export class DownloadService {
 
       if (actualLastState) {
         handleProgress(getFullProgressMessage({
-          fallbackName: 'youtube-dl',
+          fallbackName,
           fallbackState: lastFallbackState,
           isUsingFallback: downloader.isUsingFallback,
           mainState: lastState,
@@ -95,7 +96,11 @@ export class DownloadService {
       throw downloadError;
     }
 
-    handleProgress(getProgressionFinishedMessage());
+    handleProgress(getProgressionFinishedMessage({
+      fallbackName,
+      isUsingFallback: downloader.isUsingFallback,
+      mainState: lastFallbackState ? lastState : undefined,
+    }));
 
     const originalMusic = new Music(result.destFile);
     const standardMusic = Music.tryParseUnknownPath(result.destFile);

@@ -1,6 +1,14 @@
-import { SelectMenuInteraction, ButtonInteraction, ModalSubmitInteraction, Message, BaseMessageOptions } from 'discord.js';
+import {
+  SelectMenuInteraction,
+  ButtonInteraction,
+  ModalSubmitInteraction,
+  Message,
+  BaseMessageOptions,
+  DiscordjsError,
+} from 'discord.js';
 
 import { MessageBuilder } from './Message';
+import { hasDiscordWebhookTokenExpired } from './utils';
 import { getErrorMessage, Queue } from '../utils';
 import { ReplyableInteraction } from './types';
 
@@ -12,8 +20,9 @@ export class Reply {
   components: BaseMessageOptions['components'];
   #originalReply: Message | undefined;
   readonly originalMessage: MessageBuilder = new MessageBuilder();
-  #originalComponents: BaseMessageOptions['components'];
+  originalComponents: BaseMessageOptions['components'];
   #queue: Queue<Message> = new Queue();
+  #discordMessage: Message<boolean> | undefined;
 
   constructor(interaction: ReplyableInteraction, options?: ReplyOptions | undefined) {
     this.#interaction = interaction;
@@ -78,7 +87,7 @@ export class Reply {
       fetchReply: true,
     }));
     this.originalMessage.reply.content = this.#originalReply.content;
-    this.#originalComponents = this.#originalReply.components;
+    this.originalComponents = this.#originalReply.components;
 
     return this.#originalReply;
   }
@@ -94,10 +103,28 @@ export class Reply {
 
     const content = this.originalMessage.toString({ debug: this.debug });
 
-    return await this.#queue.run(() => this.#interaction.editReply({
-      content,
-      components: this.#originalComponents,
-    }));
+    return await this.#queue.run(async () => {
+      try {
+        this.#discordMessage = await this.#interaction.editReply({
+          content,
+          components: this.originalComponents,
+        });
+        return this.#discordMessage;
+      } catch (error) {
+        if (
+          !hasDiscordWebhookTokenExpired(error) ||
+          !this.#discordMessage
+        ) {
+          throw error;
+        }
+
+        this.#discordMessage = await this.#discordMessage.edit({
+          content,
+          components: this.originalComponents,
+        });
+        return this.#discordMessage;
+      }
+    });
   }
 
   removeComponents(): this {
@@ -106,7 +133,7 @@ export class Reply {
   }
 
   removeOriginalComponents(): this {
-    this.#originalComponents = [];
+    this.originalComponents = [];
     return this;
   }
 
@@ -136,26 +163,61 @@ export class Reply {
       const { channel } = this.#interaction;
       const originalReply = this.#originalReply;
 
-      return await channel.send({
+      this.#discordMessage = await channel.send({
         content,
         components: this.components,
         reply: { messageReference: originalReply },
       });
+      return this.#discordMessage;
     }
 
     if (this.#replied) {
-      return await this.#interaction.editReply({
-        content,
-        components: this.components,
-      });
+      try {
+        this.#discordMessage = await this.#interaction.editReply({
+          content,
+          components: this.components,
+        });
+        return this.#discordMessage;
+      } catch (error) {
+        if (
+          !hasDiscordWebhookTokenExpired(error) ||
+          !this.#discordMessage
+        ) {
+          throw error;
+        }
+
+        this.#discordMessage = await this.#discordMessage.edit({
+          content,
+          components: this.components,
+        });
+        return this.#discordMessage;
+      }
     }
 
     this.#replied = true;
-    return await this.#interaction.reply({
-      content,
-      fetchReply: true,
-      components: this.components,
-    });
+
+    try {
+      this.#discordMessage = await this.#interaction.reply({
+        content,
+        fetchReply: true,
+        components: this.components,
+      });
+      return this.#discordMessage;
+    } catch (error) {
+      if (
+        !hasDiscordWebhookTokenExpired(error) ||
+        !this.#interaction.channel
+      ) {
+        throw error;
+      }
+
+      this.#discordMessage = await this.#interaction.channel.send({
+        content,
+        components: this.components,
+
+      });
+      return this.#discordMessage;
+    }
   }
 }
 
