@@ -19,6 +19,10 @@ export class ComponentIdGenerator {
   }
 
   option = <OptionName extends string>(name: OptionName, alias: string): ComponentIdGenerator => {
+    if (alias === 'n') {
+      throw new Error('The alias "n" is reserved and cannot be used');
+    }
+
     this.#options[name] = { alias };
     this.#aliases[alias] = { option: name };
 

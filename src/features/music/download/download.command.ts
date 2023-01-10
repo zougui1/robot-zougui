@@ -30,7 +30,7 @@ export const subCommandDownload = new Command('download')
       url: options.url,
       playlistName: options.playlist,
       onProgress: async progress => {
-        await reply.sendContent(`__Downloading:__\n${options.url}\n\n${progress}`);
+        await reply.sendContent(`__Downloading:__\n<${options.url}>\n\n${progress}`);
       },
     });
 

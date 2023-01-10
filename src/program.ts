@@ -7,7 +7,7 @@ import { Furaffinity } from './furaffinity';
 import { fapCommand } from './features/fap';
 import { showCommand, newButton, seasonModal } from './features/show';
 import { storyCommand, subCommandGetUrl } from './features/story';
-import { musicCommand, musicNamingSelectMenu } from './features/music';
+import { musicCommand, musicNamingSelectMenu, renamingModal } from './features/music';
 import { createAuthorizer, createChannelWhitelist } from './middlewares';
 import { Network, NetworkStatus, ProcessProgress } from './utils';
 import env from './env';
@@ -43,6 +43,7 @@ const createProgram = async (): Promise<Program> => {
   program.addButton(newButton);
 
   program.addModal(seasonModal);
+  program.addModal(renamingModal);
 
   ProcessProgress.defaultIcons.running = env.discord.icons.running;
   ProcessProgress.defaultIcons.error = env.discord.icons.error;

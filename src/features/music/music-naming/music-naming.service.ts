@@ -15,7 +15,7 @@ export class MusicNamingService {
     await playlist.addMusic(filePath);
   }
 
-  async transformFileName(options: MusicOptions): Promise<void> {
+  async transformFileName(options: MusicOptions): Promise<{ fileName: string }> {
     const filePath = await this.getFilePath(options);
     const music = new Music(filePath);
     const maybeNewMusic = await music.tryRenameFromUnknownPath();
@@ -26,6 +26,46 @@ export class MusicNamingService {
 
     const playlist = await this.getPlaylist(options.playlist);
     await playlist.addMusic(maybeNewMusic);
+
+    return {
+      fileName: maybeNewMusic.fileName,
+    };
+  }
+
+  async renameFile(options: RenameFileOptions): Promise<{ fileName: string }> {
+    const filePath = await this.getFilePath(options);
+    const music = new Music(filePath);
+    const newMusic = await music.rename(options);
+
+    const playlist = await this.getPlaylist(options.playlist);
+    await playlist.addMusic(newMusic);
+
+    return {
+      fileName: newMusic.fileName,
+    };
+  }
+
+  async resolveFileName(options: MusicOptions): Promise<ResolvedFileName> {
+    const filePath = await this.getFilePath(options);
+    const maybeMusic = Music.tryParseUnknownPath(filePath);
+
+    if (!maybeMusic) {
+      const music = new Music(filePath);
+
+      return {
+        trackNumber: music.trackNumber,
+        title: music.title,
+        // copy of the array because it is readonly
+        artists: [...music.artists],
+      };
+    }
+
+    return {
+      trackNumber: maybeMusic.trackNumber,
+      title: maybeMusic.title,
+      // copy of the array because it is readonly
+      artists: [...maybeMusic.artists],
+    };
   }
 
   private async getPlaylist(name: string): Promise<Playlist> {
@@ -53,4 +93,18 @@ export class MusicNamingService {
 export interface MusicOptions {
   playlist: string;
   fileName: string;
+}
+
+export interface RenameFileOptions {
+  trackNumber: number;
+  title: string;
+  artists: string[];
+  playlist: string;
+  fileName: string;
+}
+
+export interface ResolvedFileName {
+  trackNumber: number;
+  title: string;
+  artists: string[];
 }
