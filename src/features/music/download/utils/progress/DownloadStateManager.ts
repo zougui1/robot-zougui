@@ -42,7 +42,7 @@ export class DownloadStateManager {
       ? `${env.discord.icons.warning} falling back to ${this.#fallbackName}`
       : '';
 
-    return `${mainProgressMessage}\n\n${fallbackMessage}\n\n${fallbackProgressMessage}`;
+    return `${mainProgressMessage}\n\n${fallbackMessage}\n\n${fallbackProgressMessage}`.trim();
   }
 
   useFallback(name: string): this {

@@ -29,8 +29,6 @@ export const subCommandCreateChapter = new Command('create-chapter')
     reply.defer();
     const service = new CreateChapterService();
 
-    let tempMessage: Message | undefined;
-
     const result = await service.createChapterFromSubmission({
       ...options,
       onProgress: async progress => {
@@ -43,16 +41,9 @@ export const subCommandCreateChapter = new Command('create-chapter')
           files: [attachment],
         });
 
-        tempMessage = message;
         return message?.attachments.at(0)?.url;
       },
     });
-
-    if (tempMessage) {
-      tempMessage?.delete().catch(error => {
-        debug(chalk.red('[ERROR]'), error);
-      });
-    }
 
     await reply.respondSuccess(result.message);
   });
