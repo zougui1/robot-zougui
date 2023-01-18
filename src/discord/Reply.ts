@@ -4,7 +4,6 @@ import {
   ModalSubmitInteraction,
   Message,
   BaseMessageOptions,
-  DiscordjsError,
 } from 'discord.js';
 
 import { MessageBuilder } from './Message';

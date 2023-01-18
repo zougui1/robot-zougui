@@ -22,7 +22,7 @@ export const renamingModal = new Modal('music-renaming')
 
     await reply.fetchOriginalReply();
     reply.originalComponents = [];
-    reply.originalMessage.reply.content += '\nManual file renaming';
+    reply.originalMessage.reply.content += '\n\nManual file renaming';
     await reply.editOriginalReply();
 
     if (!_.isNumber(trackNumber)) {

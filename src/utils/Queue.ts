@@ -2,7 +2,7 @@ import Emittery from 'emittery';
 import { nanoid } from 'nanoid';
 
 export class Queue<T = unknown> extends Emittery<QueueEventMap<T>> {
-  readonly #items: QueueItem<T>[] = [];
+  #items: QueueItem<T>[] = [];
   #current: QueueItem<T> | undefined;
 
   run(func: QueuedFunction<T>): Promise<T> {

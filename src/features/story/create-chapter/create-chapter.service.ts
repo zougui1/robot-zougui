@@ -32,7 +32,7 @@ export class CreateChapterService extends StoryService {
       progressPromises.push(options.onProgress(progress));
     }
 
-    await this.checkChapterUrl(cleanUrl);
+    //await this.checkChapterUrl(cleanUrl);
 
     const submission = await downloadSubmission(options.url, env.tempDir, {
       onProgress: state => handleProgress(state.progressString),

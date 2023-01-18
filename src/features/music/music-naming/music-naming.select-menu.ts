@@ -15,21 +15,21 @@ export const musicNamingSelectMenu = new SelectMenu('music-naming')
     const service = new MusicNamingService();
     const [value] = interaction.values;
 
-    reply.originalComponents = [];
-
     switch (value) {
       case MusicNamingOption.originalFileName:
         await reply.fetchOriginalReply();
+        reply.originalComponents = [];
         await service.moveToPlaylist(options);
-        reply.originalMessage.reply.content += '\nKept original file name';
+        reply.originalMessage.reply.content += '\n\nKept original file name';
         await reply.editOriginalReply();
         await reply.respondSuccess(`The file has been added to the playlist "${options.playlist}"`);
         break;
 
       case MusicNamingOption.resolvedFileName:
         await reply.fetchOriginalReply();
+        reply.originalComponents = [];
         await service.transformFileName(options);
-        reply.originalMessage.reply.content += '\nRenamed file to resolved name';
+        reply.originalMessage.reply.content += '\n\nRenamed file to resolved name';
         await reply.editOriginalReply();
         await reply.respondSuccess(`The file has been renamed and added to the playlist "${options.playlist}"`);
         break;
@@ -76,11 +76,10 @@ export const musicNamingSelectMenu = new SelectMenu('music-naming')
 
         onceDeletedFromCache?.(async () => {
           reply.removeComponents();
-          reply.message.reply.content += '\nCan no longer rename the file';
+          reply.message.reply.content += '\n\nCan no longer rename the file';
           await reply.reply();
         });
 
-        reply.originalMessage.reply.content += '\nManual file renaming';
         await interaction.showModal(modal);
         break;
       }

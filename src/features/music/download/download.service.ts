@@ -3,7 +3,7 @@ import * as _ from 'radash';
 import { PlaylistRepo, Youtube, Music } from '@zougui/common.music-repo';
 import { DownloadState } from '@zougui/common.music-repo/lib/youtube/downloader/parser';
 
-import { getFullProgressMessage, getProgressionFinishedMessage } from './utils';
+import { DownloadStateManager } from './utils/progress/DownloadStateManager';
 import { Exception } from '../../../error';
 import env from '../../../env';
 
@@ -30,7 +30,6 @@ export class DownloadService {
   async downloadMusic(options: DownloadMusicOptions): Promise<DownloadMusicResult> {
     const { playlistName, url } = options;
     const progressPromises: (Promise<void> | void)[] = [];
-    const fallbackName = 'youtube-dl';
 
     const playlist = await this.#repo.getPlaylist(playlistName);
     const playlistExists = await playlist?.getExists();
@@ -53,29 +52,37 @@ export class DownloadService {
     let lastState: DownloadState | undefined;
     let lastFallbackState: DownloadState | undefined;
 
+    const stateManager = new DownloadStateManager();
+
     const handleProgress = (progress: string): void => {
       progressPromises.push(options.onProgress(progress));
     }
 
-    downloader.parser.on('message', ({ parser }) => {
+    downloader.on('fallback', ({ command }) => {
+      stateManager.useFallback(command);
+    });
+
+    const update = () => {
       if (downloader.isUsingFallback) {
-        lastFallbackState = _.clone(parser.state);
-
-        handleProgress(getFullProgressMessage({
-          fallbackName,
-          fallbackState: parser.state,
-          isUsingFallback: downloader.isUsingFallback,
-          mainState: lastState,
-        }));
+        lastFallbackState = _.clone(downloader.parser.state);
       } else {
-        lastState = _.clone(parser.state);
-
-        handleProgress(getFullProgressMessage({
-          fallbackName,
-          isUsingFallback: downloader.isUsingFallback,
-          mainState: parser.state,
-        }));
+        lastState = _.clone(downloader.parser.state);
       }
+
+      handleProgress(stateManager.getProgressString());
+    }
+
+    downloader.parser.on('end-step', ({ name }) => {
+      stateManager.finish(name);
+      update();
+    });
+
+    downloader.parser.on('progress-step', ({ name, progress }) => {
+      if (name === 'downloadingFile' && progress) {
+        stateManager.updateRunningContent(name, progress.toString());
+      }
+
+      update();
     });
 
     const [downloadError, result] = await _.try(downloader.exec)();
@@ -84,23 +91,12 @@ export class DownloadService {
       const actualLastState = lastFallbackState || lastState;
 
       if (actualLastState) {
-        handleProgress(getFullProgressMessage({
-          fallbackName,
-          fallbackState: lastFallbackState,
-          isUsingFallback: downloader.isUsingFallback,
-          mainState: lastState,
-          errored: true,
-        }));
+        stateManager.errorCurrent();
+        handleProgress(stateManager.getProgressString());
       }
 
       throw downloadError;
     }
-
-    handleProgress(getProgressionFinishedMessage({
-      fallbackName,
-      isUsingFallback: downloader.isUsingFallback,
-      mainState: lastFallbackState ? lastState : undefined,
-    }));
 
     const originalMusic = new Music(result.destFile);
     const standardMusic = Music.tryParseUnknownPath(result.destFile);
