@@ -58,6 +58,12 @@ const getProdEnv = () => {
         readTrace: {
           id: env.get('NOTION.DATABASE.READ_TRACE.ID').required().asString(),
         },
+        exercises: {
+          id: env.get('NOTION.DATABASE.EXERCISES.ID').required().asString(),
+        },
+        exerciseDatabase: {
+          id: env.get('NOTION.DATABASE.EXERCISE_DATABASE.ID').required().asString(),
+        },
       },
       stats: {
         fapping: {

@@ -8,6 +8,12 @@ import { fapCommand } from './features/fap';
 import { showCommand, newButton, seasonModal } from './features/show';
 import { storyCommand, subCommandGetUrl } from './features/story';
 import { musicCommand, musicNamingSelectMenu, renamingModal } from './features/music';
+import {
+  exerciseCommand,
+  endButton,
+  newButton as newExerciseButton,
+  newExerciseModal,
+} from './features/exercise';
 import { createAuthorizer, createChannelWhitelist } from './middlewares';
 import { Network, NetworkStatus, ProcessProgress } from './utils';
 import env from './env';
@@ -37,13 +43,17 @@ const createProgram = async (): Promise<Program> => {
   program.addCommand(showCommand);
   program.addCommand(storyCommand);
   program.addCommand(musicCommand);
+  program.addCommand(exerciseCommand);
 
   program.addSelectMenu(musicNamingSelectMenu);
 
   program.addButton(newButton);
+  program.addButton(endButton);
+  program.addButton(newExerciseButton);
 
   program.addModal(seasonModal);
   program.addModal(renamingModal);
+  program.addModal(newExerciseModal);
 
   ProcessProgress.defaultIcons.running = env.discord.icons.running;
   ProcessProgress.defaultIcons.error = env.discord.icons.error;

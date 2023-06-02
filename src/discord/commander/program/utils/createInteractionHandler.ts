@@ -23,7 +23,7 @@ export const createInteractionHandler = (options: CreateInteractionHandlerOption
       return await handleCommandInteraction(interaction, options.commands);
     }
 
-    if (interaction.isSelectMenu()) {
+    if (interaction.isStringSelectMenu()) {
       return await options.selectMenus.execute(interaction);
     }
 

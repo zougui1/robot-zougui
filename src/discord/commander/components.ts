@@ -1,18 +1,18 @@
 import {
-  SelectMenuInteraction,
+  StringSelectMenuInteraction,
   ButtonInteraction,
   ModalSubmitInteraction,
 
-  SelectMenuBuilder,
+  StringSelectMenuBuilder,
   ButtonBuilder,
   ModalBuilder,
 } from 'discord.js';
 
 import { componentFactory, Component, ComponentMap } from './component';
 
-export const SelectMenu = componentFactory<SelectMenuInteraction, SelectMenuBuilder>('select-menu', SelectMenuBuilder);
-export type SelectMenuMap = ComponentMap<SelectMenuInteraction, InstanceType<typeof SelectMenu>>;
-export type AnySelectMenu = Component<SelectMenuInteraction, SelectMenuBuilder, any>;
+export const SelectMenu = componentFactory<StringSelectMenuInteraction, StringSelectMenuBuilder>('select-menu', StringSelectMenuBuilder);
+export type SelectMenuMap = ComponentMap<StringSelectMenuInteraction, InstanceType<typeof SelectMenu>>;
+export type AnySelectMenu = Component<StringSelectMenuInteraction, StringSelectMenuBuilder, any>;
 
 export const Button = componentFactory<ButtonInteraction, ButtonBuilder>('button', ButtonBuilder);
 export type ButtonMap = ComponentMap<ButtonInteraction, InstanceType<typeof Button>>;
